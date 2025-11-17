@@ -1,0 +1,228 @@
+import { BooksRecord, PerformanceRecord, AIRTABLE_CONFIG } from "./schema";
+import Airtable, { FieldSet } from "airtable";
+
+function getEnv(name: string) {
+  const v = process.env[name];
+  if (!v) {
+    throw new Error(`Missing environment variable ${name}`);
+  }
+  return v;
+}
+
+const AIRTABLE_KEY = getEnv("AIRTABLE_API_KEY");
+const AIRTABLE_BASE = getEnv("AIRTABLE_BASE_ID");
+
+const base = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE);
+
+/**
+ * Fetch all performance records to calculate dashboard metrics
+ */
+async function getAllPerformanceRecords(): Promise<PerformanceRecord[]> {
+  const all: PerformanceRecord[] = [];
+
+  return new Promise((resolve, reject) => {
+    base(AIRTABLE_CONFIG.tables.performanceRecords.id)
+      .select({ pageSize: 100 })
+      .eachPage(
+        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+          all.push(
+            ...records.map((r: any) => ({
+              id: r.id,
+              ...(r.fields || {}),
+            } as PerformanceRecord))
+          );
+          fetchNextPage();
+        },
+        (err?: any) => {
+          if (err) return reject(err);
+          resolve(all);
+        }
+      );
+  });
+}
+
+/**
+ * Fetch all books
+ */
+async function getAllBooks(): Promise<BooksRecord[]> {
+  const all: BooksRecord[] = [];
+
+  return new Promise((resolve, reject) => {
+    base(AIRTABLE_CONFIG.tables.books.id)
+      .select({ pageSize: 100 })
+      .eachPage(
+        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+          all.push(
+            ...records.map((r: any) => ({
+              id: r.id,
+              ...(r.fields || {}),
+            } as BooksRecord))
+          );
+          fetchNextPage();
+        },
+        (err?: any) => {
+          if (err) return reject(err);
+          resolve(all);
+        }
+      );
+  });
+}
+
+export interface DashboardMetrics {
+  totalRevenues: number;
+  totalListeningMinutes: number;
+  uploadedBooksCount: number;
+  averageRating: number;
+  revenuesChange: number; // percentage
+  listeningMinutesChange: number; // percentage
+  uploadedBooksChange: number; // percentage
+  ratingChange: number; // percentage
+  labels: string[];
+  revenuesSeries: number[];
+  listeningMinutesSeries: number[];
+  uploadedBooksSeries: number[];
+  ratingSeries: number[];
+}
+
+/**
+ * Calculate percentage change between two values
+ */
+function calculatePercentageChange(current: number, previous: number): number {
+  if (previous === 0) return 0;
+  return parseFloat((((current - previous) / previous) * 100).toFixed(2));
+}
+
+/**
+ * Calculate dashboard metrics from Airtable data
+ */
+export async function calculateDashboardMetrics(): Promise<DashboardMetrics> {
+  try {
+    const [books, performances] = await Promise.all([
+      getAllBooks(),
+      getAllPerformanceRecords(),
+    ]);
+
+    // Current period metrics
+    const currentRevenues = performances.reduce((sum, p) => sum + (p.Revenue || 0), 0);
+    const currentListeningMinutes = performances.reduce(
+      (sum, p) => sum + (p["Total Listening Minutes"] || 0),
+      0
+    );
+    const currentUploadedBooksCount = books.filter((b) => b["Is Active"]).length;
+
+    // Calculate average rating from current period
+    const validRatings = performances.filter((p) => p["5-star Rate"] && p["5-star Rate"] > 0);
+    const currentAverageRating =
+      validRatings.length > 0
+        ? validRatings.reduce((sum, p) => sum + p["5-star Rate"], 0) / validRatings.length
+        : 0;
+
+    // Previous period metrics (30 days ago)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const previousPerformances = performances.filter((p) => {
+      if (!p["Record Date"]) return false;
+      const recordDate = new Date(p["Record Date"]);
+      return recordDate < thirtyDaysAgo;
+    });
+
+    const previousRevenues = previousPerformances.reduce((sum, p) => sum + (p.Revenue || 0), 0);
+    const previousListeningMinutes = previousPerformances.reduce(
+      (sum, p) => sum + (p["Total Listening Minutes"] || 0),
+      0
+    );
+
+    // sort by date, and get the last 30 days uploaded books
+    const previousUploadedBooksCount = books.filter((b) => {
+      if (!b["Upload Date"]) return false;
+      const uploadDate = new Date(b["Upload Date"]);
+      console.log(uploadDate)
+      return uploadDate < thirtyDaysAgo && b["Is Active"];
+    }).length;
+
+    console.log({previousUploadedBooksCount});
+
+    // Calculate average rating from previous period
+    const previousValidRatings = previousPerformances.filter(
+      (p) => p["5-star Rate"] && p["5-star Rate"] > 0
+    );
+    const previousAverageRating =
+      previousValidRatings.length > 0
+        ? previousValidRatings.reduce((sum, p) => sum + p["5-star Rate"], 0) /
+          previousValidRatings.length
+        : currentAverageRating;
+
+    // Build time series for the last N days (including today)
+    const days = 30;
+    const labels: string[] = [];
+    const revenuesSeries: number[] = [];
+    const listeningMinutesSeries: number[] = [];
+    const uploadedBooksSeries: number[] = [];
+    const ratingSeries: number[] = [];
+
+    const startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+    startDate.setDate(startDate.getDate() - days);
+
+    const dateKeys: string[] = [];
+    for (let i = 0; i < days; i++) {
+      const d = new Date(startDate);
+      d.setDate(startDate.getDate() + i);
+      const label = d.toUTCString().split(',')[1].slice(0, -17);
+      labels.push(label);
+      dateKeys.push(d.toISOString().slice(0, 10)); // YYYY-MM-DD
+    }
+
+    const toDateKey = (v?: string | number | Date) => {
+      if (!v) return null;
+      const d = new Date(v as any);
+      if (isNaN(d.getTime())) return null;
+      return d.toISOString().slice(0, 10);
+    };
+
+    for (const key of dateKeys) {
+      const dayPerformances = performances.filter((p) => toDateKey(p["Record Date"]) === key);
+      const dayRevenue = dayPerformances.reduce((s, p) => s + (p.Revenue || 0), 0);
+      const dayListening = dayPerformances.reduce((s, p) => s + (p["Total Listening Minutes"] || 0), 0);
+      const dayRatings = dayPerformances.filter((p) => p["5-star Rate"] && p["5-star Rate"] > 0);
+      const dayAvgRating = dayRatings.length > 0 ? dayRatings.reduce((s, p) => s + p["5-star Rate"], 0) / dayRatings.length : 0;
+
+      const dayBooksCount = books.filter((b) => {
+        const uploadDate = toDateKey(b["Upload Date"]);
+        if (!uploadDate) return false;
+        return uploadDate == key && b["Is Active"];
+      }).length;
+
+      revenuesSeries.push(parseFloat(dayRevenue.toFixed(2)));
+      listeningMinutesSeries.push(Math.round(dayListening));
+      uploadedBooksSeries.push(dayBooksCount);
+      ratingSeries.push(parseFloat(dayAvgRating.toFixed(1)));
+    }
+
+    // Calculate changes (compare current totals vs previous period totals)
+    const revenuesChange = calculatePercentageChange(currentRevenues, previousRevenues);
+    const listeningMinutesChange = calculatePercentageChange(currentListeningMinutes,previousListeningMinutes);
+    const uploadedBooksChange = calculatePercentageChange(currentUploadedBooksCount, previousUploadedBooksCount);
+    const ratingChange = calculatePercentageChange(currentAverageRating, previousAverageRating);
+
+    return {
+      totalRevenues: parseFloat(currentRevenues.toFixed(2)),
+      totalListeningMinutes: Math.round(currentListeningMinutes),
+      uploadedBooksCount: currentUploadedBooksCount,
+      averageRating: parseFloat(currentAverageRating.toFixed(1)),
+      revenuesChange,
+      listeningMinutesChange,
+      uploadedBooksChange,
+      ratingChange,
+      labels,
+      revenuesSeries,
+      listeningMinutesSeries,
+      uploadedBooksSeries,
+      ratingSeries,
+    };
+  } catch (error) {
+    console.error("Error calculating dashboard metrics:", error);
+    throw error;
+  }
+}
