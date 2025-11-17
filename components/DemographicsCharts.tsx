@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
-import type { DemographicsData } from "../../lib/airtable";
+import type { DemographicsData } from "../lib/airtable";
 
 interface DemographicsChartsProps {
   data?: DemographicsData;

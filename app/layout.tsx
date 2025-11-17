@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "./globals.css";
+import Navigator from "../components/Navigator";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -20,10 +21,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl">
-      <body
-        className={`${cairo.variable} antialiased`}
-      >
-        {children}
+      <body className={`${cairo.variable} antialiased bg-white dark:bg-black`}>
+          <div className="flex min-h-screen">
+            <Navigator />
+            <main className="flex-1 p-6">{children}</main>
+          </div>
       </body>
     </html>
   );

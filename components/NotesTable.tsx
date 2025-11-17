@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import type { NotesRecord } from "../../lib/schema";
+import type { NotesRecord } from "../lib/schema";
 
 interface NotesTableProps {
   notes?: NotesRecord[];
@@ -31,7 +31,7 @@ export default function NotesTable({ notes = [] }: NotesTableProps) {
         <table className="w-full">
           <thead className="bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
             <tr>
-              <th className="px-6 py-3 text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">العنوان</th>
+              <th className="px-6 py-3 text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">رقم الملاحظة</th>
               <th className="px-6 py-3 text-right text-sm font-medium text-zinc-700 dark:text-zinc-300">المحتوى</th>
             </tr>
           </thead>
@@ -50,12 +50,12 @@ export default function NotesTable({ notes = [] }: NotesTableProps) {
                 >
                   <td className="px-6 py-4">
                     <div className="text-sm font-medium text-zinc-900 dark:text-zinc-50 max-w-xs truncate">
-                      {note["Note Title"] || "—"}
+                      {note["Note ID"] || "—"}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-zinc-600 dark:text-zinc-400 max-w-md line-clamp-2">
-                      {note["Note Content"] || "—"}
+                      {note["Body"] || "—"}
                     </div>
                   </td>
                 </tr>

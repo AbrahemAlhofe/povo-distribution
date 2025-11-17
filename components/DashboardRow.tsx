@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { IndicatorCard } from "./IndicatorCard";
-import type { DashboardMetrics } from "../../lib/metrics";
+import type { DashboardMetrics } from "../lib/metrics";
+import { Lineicons } from "@lineiconshq/react-lineicons";
+import { BarChartDollarSolid, Headphone1Solid, Book1Solid, StarFatHalf2Solid } from "@lineiconshq/free-icons";
 
 type MetricKey = "revenues" | "listening" | "books" | "rating";
 
@@ -45,28 +47,28 @@ export default function DashboardRow({ metrics }: { metrics: DashboardMetrics })
         <IndicatorCard
           label="إجمالي الإيرادات"
           value={`$${metrics.totalRevenues.toLocaleString("en-US")}`}
-          icon={<span className="text-xl">💵</span>}
+          icon={<Lineicons icon={BarChartDollarSolid} className="text-2xl text-green-500" />}
           changePercent={metrics.revenuesChange}
           onHover={handleHover("revenues")}
         />
         <IndicatorCard
           label="عدد دقائق الاستماع"
           value={metrics.totalListeningMinutes.toLocaleString("en-US")}
-          icon={<span className="text-xl">🎧</span>}
+          icon={<Lineicons icon={Headphone1Solid} className="text-2xl text-blue-500" />}
           changePercent={metrics.listeningMinutesChange}
           onHover={handleHover("listening")}
         />
         <IndicatorCard
           label="إجمالي الكتب المرفوعة"
           value={metrics.uploadedBooksCount}
-          icon={<span className="text-xl">📚</span>}
+          icon={<Lineicons icon={Book1Solid} className="text-2xl text-indigo-500" />}
           changePercent={metrics.uploadedBooksChange}
           onHover={handleHover("books")}
         />
         <IndicatorCard
           label="متوسط التقييم العام"
           value={metrics.averageRating}
-          icon={<span className="text-xl">⭐</span>}
+          icon={<Lineicons icon={StarFatHalf2Solid} className="text-2xl text-yellow-400" />}
           changePercent={metrics.ratingChange}
           onHover={handleHover("rating")}
         />

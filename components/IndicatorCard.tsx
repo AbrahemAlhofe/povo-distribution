@@ -1,5 +1,7 @@
 "use client";
 
+import { AngleDoubleDownSolid, AngleDoubleUpSolid } from "@lineiconshq/free-icons";
+import { Lineicons } from "@lineiconshq/react-lineicons";
 import React from "react";
 
 export interface IndicatorCardProps {
@@ -14,7 +16,6 @@ export interface IndicatorCardProps {
 
 export function IndicatorCard({ label, value, icon, changePercent, unit, onHover, onLeave }: IndicatorCardProps) {
   const isPositive = changePercent >= 0;
-  // keep component lightweight; hover handled by parent via callbacks
 
   return (
     <div
@@ -45,7 +46,7 @@ export function IndicatorCard({ label, value, icon, changePercent, unit, onHover
             isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
           }`}
         >
-          <span>{isPositive ? "↗" : "↘"}</span>
+          <span>{isPositive ? <Lineicons icon={AngleDoubleUpSolid} className="text-2xl text-green-600" /> : <Lineicons icon={AngleDoubleDownSolid} className="text-2xl text-red-600" />}</span>
           <span>{Math.abs(changePercent)}%</span>
         </div>
       ) : null}

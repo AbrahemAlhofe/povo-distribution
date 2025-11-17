@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import type { TopAuthor, TopBook } from "../../lib/airtable";
+import type { TopAuthor, TopBook } from "../lib/airtable";
 
 interface StatItem {
   id: string;

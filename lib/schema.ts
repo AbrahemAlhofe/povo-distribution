@@ -29,6 +29,9 @@ export interface BooksRecord {
   // Formula fields
   "Total Revenues": number; // formula - SUM of Revenues (fldBnR6oxKBhzHYUF)
   "Total Listening Minutes": number; // formula - SUM of Listening minutes (fldBfD1OnP6RgWTrN)
+  "5-star Rate": number; // formula - AVERAGE of 5-star Rate (fldKAJpunD84jy6ri)
+  "Platform Names": string[]; // formula - CONCATENATE Platform names (fldXy3b2b2YJ0qv3K)
+  'Completion Ratio': number; // percent with 1 decimal precision (fldCompletionRatio)
 }
 
 /**
@@ -63,7 +66,7 @@ export interface PerformanceRecord {
   "Top Listening Countries": ("مصر" | "السعودية" | "المغرب" | "الجزائر" | "العراق" | "قطر")[]; // multipleSelects
   
   // Lookup - Client from linked Book
-  Client: string[]; // multipleLookupValues from Book.Client (fldFEu50Ki77wCTKl)
+  Client: string[];
 }
 
 /**
