@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Lineicons from "@lineiconshq/react-lineicons";
-import { Home2Outlined, Books2Solid, Books2Outlined, Home2Solid } from "@lineiconshq/free-icons";
+import { Home2Outlined, Books2Solid, Books2Outlined, Home2Solid, BarChartDollarOutlined, BarChartDollarSolid } from "@lineiconshq/free-icons";
 
 const NavItem = ({ label, href, icon, active = false }: { label: string; href: string; icon: React.ReactNode; active?: boolean }) => (
   <li>
@@ -37,6 +37,12 @@ export default function Navigator() {
             href="/books" 
             icon={<Lineicons icon={pathname === "/books" ? Books2Solid : Books2Outlined} size={24} color="blue" strokeWidth={1.5} />}
             active={pathname === "/books"}
+          />
+          <NavItem 
+            label="الإيرادات" 
+            href="/revenues" 
+            icon={<Lineicons icon={pathname === "/revenues" ? BarChartDollarSolid : BarChartDollarOutlined} size={24} color="blue" strokeWidth={1.5} />}
+            active={pathname === "/revenues"}
           />
         </ul>
       </nav>

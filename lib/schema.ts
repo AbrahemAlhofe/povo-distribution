@@ -133,6 +133,7 @@ export interface InvoicesRecord {
   
   // Relationships
   Client: string; // multipleRecordLinks to Clients (fldi6auxFvF5xaHSc) - prefersSingleRecordLink
+  "Client Names": string[]; // multipleLookupValues from Client.Client Name (fldJ1j56Y6Y6x6q2K)
 }
 
 /**

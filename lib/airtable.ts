@@ -1,5 +1,5 @@
 import Airtable, { FieldSet } from "airtable";
-import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG } from "./schema";
+import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -244,6 +244,69 @@ export async function getDemographicsData(): Promise<DemographicsData> {
   }
 }
 
+export interface RevenueMetrics {
+  totalRevenue: number;
+  totalPaidRevenue: number;
+  totalUnpaidRevenue: number;
+}
+
+/**
+ * Get revenue metrics from invoices
+ */
+export async function getRevenueMetrics(): Promise<RevenueMetrics> {
+  try {
+    const base = new Airtable({ apiKey: getEnv("AIRTABLE_API_KEY") }).base(
+      getEnv("AIRTABLE_BASE_ID")
+    );
+
+    const all: InvoicesRecord[] = [];
+
+    return new Promise((resolve, reject) => {
+      base(AIRTABLE_CONFIG.tables.invoices.id)
+        .select({ pageSize: 100 })
+        .eachPage(
+          (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+            all.push(
+              ...records.map((r: any) => ({
+                id: r.id,
+                ...(r.fields || {}),
+              }))
+            );
+            fetchNextPage();
+          },
+          (err?: any) => {
+            if (err) return reject(err);
+
+            let totalRevenue = 0;
+            let totalPaidRevenue = 0;
+            let totalUnpaidRevenue = 0;
+
+            for (const invoice of all) {
+              const amount = invoice['Invoice Amount'] || 0;
+              const isPaid = invoice['Is Paid'] || "";
+
+              totalRevenue += amount;
+              if (isPaid) {
+                totalPaidRevenue += amount;
+              } else {
+                totalUnpaidRevenue += amount;
+              }
+            }
+
+            resolve({
+              totalRevenue,
+              totalPaidRevenue,
+              totalUnpaidRevenue,
+            });
+          }
+        );
+    });
+  } catch (error) {
+    console.error("Error fetching revenue metrics:", error);
+    throw error;
+  }
+}
+
 /**
  * Get recent notes
  */
@@ -263,6 +326,36 @@ export async function getNotes(limit: number = 10): Promise<NotesRecord[]> {
               id: r.id,
               ...(r.fields || {}),
             } as NotesRecord))
+          );
+          fetchNextPage();
+        },
+        (err?: any) => {
+          if (err) return reject(err);
+          resolve(all.slice(0, limit));
+        }
+      );
+  });
+}
+
+/**
+ * Get invoices
+ */
+export async function getInvoices(limit: number = 20): Promise<InvoicesRecord[]> {
+  const all: InvoicesRecord[] = [];
+
+  return new Promise((resolve, reject) => {
+    base(AIRTABLE_CONFIG.tables.invoices.id)
+      .select({
+        pageSize: 100,
+        sort: [{ field: "Payment Date", direction: "desc" }],
+      })
+      .eachPage(
+        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+          all.push(
+            ...records.map((r: any) => ({
+              id: r.id,
+              ...(r.fields || {}),
+            } as InvoicesRecord))
           );
           fetchNextPage();
         },
