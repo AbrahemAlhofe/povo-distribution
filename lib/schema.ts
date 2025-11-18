@@ -91,8 +91,8 @@ export interface NotesRecord {
 export interface ClientsRecord {
   id: string;
   "Client Name": string; // singleLineText (fldWvmNZQY5V0f1ty)
-  "Contact Email": string; // email (fld0OmUJfLGQ518vv)
-  "Contact Phone": string; // phoneNumber (fldUiR6GgJQ8ahaci)
+  "Email": string; // email (fld0OmUJfLGQ518vv)
+  "Password": string; // singleLineText (fldz1b2YI3pX1qf1J)
   Address: string; // singleLineText (fld05AHNvOQ0VG8C2)
   Performance: string; // singleLineText (fld5qr8UAbeHvIWSm)
   

@@ -1,5 +1,5 @@
 import Airtable, { FieldSet } from "airtable";
-import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
+import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord, ClientsRecord } from "./schema";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -365,4 +365,26 @@ export async function getInvoices(limit: number = 20): Promise<InvoicesRecord[]>
         }
       );
   });
+}
+
+export async function findClientByEmail(
+  email: string
+): Promise<Airtable.Record<FieldSet> | null> {
+  return new Promise((resolve, reject) => {
+    base(AIRTABLE_CONFIG.tables.clients.id)
+      .select({
+        maxRecords: 1,
+        filterByFormula: `{Email} = "${email}"`,
+      })
+      .firstPage((err, records) => {
+        if (err) {
+          return reject(err)
+        }
+        if (records && records.length > 0) {
+          resolve(records[0])
+        } else {
+          resolve(null)
+        }
+      })
+  })
 }
