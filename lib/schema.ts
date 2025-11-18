@@ -29,7 +29,7 @@ export interface BooksRecord {
   // Formula fields
   "Total Revenues": number; // formula - SUM of Revenues (fldBnR6oxKBhzHYUF)
   "Total Listening Minutes": number; // formula - SUM of Listening minutes (fldBfD1OnP6RgWTrN)
-  "5-star Rate": number; // formula - AVERAGE of 5-star Rate (fldKAJpunD84jy6ri)
+  Rate: number; // formula - AVERAGE of 5-star Rate (fldKAJpunD84jy6ri)
   "Platform Names": string[]; // formula - CONCATENATE Platform names (fldXy3b2b2YJ0qv3K)
   'Completion Ratio': number; // percent with 1 decimal precision (fldCompletionRatio)
 }
@@ -173,9 +173,7 @@ export interface AuthorsRecord {
   "Birthdate"?: string; // date
   // Linked books
   Books?: string[]; // multipleRecordLinks to Books
-
-  // Fallback for any additional fields until schema is generated
-  [key: string]: any;
+  "Total Revenue": number; // formula - SUM of linked Books' Total Revenues
 }
 
 /**
@@ -209,9 +207,9 @@ export const AIRTABLE_CONFIG = {
       id: "tbl270pCBvJcYyDLx",
       name: "Invoices",
     },
-    writers: {
-      id: "tbl_Writers_PLACEHOLDER",
-      name: "Writers",
+    authors: {
+      id: "tblKcmBwLebSCAnvz",
+      name: "Authors",
     },
   },
 } as const;

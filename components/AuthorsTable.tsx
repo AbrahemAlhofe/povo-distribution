@@ -1,23 +1,25 @@
 "use client";
 
-import { BooksRecord } from "@/lib/schema";
-import { StarFatSolid } from "@lineiconshq/free-icons";
-import Lineicons from "@lineiconshq/react-lineicons";
 import { useState } from "react";
+import { AuthorsRecord } from "@/lib/schema";
+
+interface AuthorsTableProps {
+  authors: AuthorsRecord[];
+}
 
 const ITEMS_PER_PAGE = 10;
 
-export default function BooksTable({ books }: { books: BooksRecord[] }) {
+export default function AuthorsTable({ authors }: AuthorsTableProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredBooks = books.filter((book) =>
-    book.Title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAuthors = authors.filter((author) =>
+    (author.Name || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const totalPages = Math.ceil(filteredBooks.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredAuthors.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedBooks = filteredBooks.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedAuthors = filteredAuthors.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -42,7 +44,7 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
         </svg>
         <input
           type="text"
-          placeholder="ابحث عن الكتب..."
+          placeholder="ابحث عن المؤلفين..."
           value={searchQuery}
           onChange={handleSearchChange}
           className="w-full pr-10 pl-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -53,56 +55,30 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
         <table className="w-full">
           <thead>
             <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800">
-              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">اسم الكتاب</th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">المنصات</th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">الإيرادات</th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">دقائق الاستماع</th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">اسم المؤلف</th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">إجمالي العوائد</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">التقييم</th>
-              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">معدل الاستماع الكامل</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedBooks.length > 0 ? (
-              paginatedBooks.map((book) => (
+            {paginatedAuthors.length > 0 ? (
+              paginatedAuthors.map((author) => (
                 <tr
-                  key={book.id}
+                  key={author.id}
                   className="cursor-pointer border-b border-zinc-100 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                 >
                   <td className="px-6 py-4 text-sm text-zinc-900 dark:text-white font-medium">
-                    {book.Title || "—"}
+                    {author.Name || "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
-                    {Array.isArray(book["Platform Names"])
-                      ? book["Platform Names"].join(", ")
-                      : "—"}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-zinc-900 dark:text-white">
-                    ${book["Total Revenues"]}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
-                    {book["Total Listening Minutes"]}
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-400"><Lineicons icon={StarFatSolid} size={15} className="text-2xl text-yellow-400" /></span>
-                      <span className="text-zinc-900 dark:text-white">
-                        {book.Rate}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="text-zinc-600 dark:text-zinc-400">
-                        {Math.round(book["Completion Ratio"] * 100)}%
-                      </span>
-                    </div>
+                    {"$" + author["Total Revenue"]?.toLocaleString() || "—"}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
-                  لم يتم العثور على كتب
+                <td colSpan={4} className="px-6 py-8 text-center text-zinc-500 dark:text-zinc-400">
+                  لم يتم العثور على مؤلفين
                 </td>
               </tr>
             )}
@@ -112,12 +88,12 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
 
       <div className="flex items-center justify-between">
         <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          {filteredBooks.length > 0 ? (
+          {filteredAuthors.length > 0 ? (
             <>
-              {startIndex + 1} - {Math.min(startIndex + ITEMS_PER_PAGE, filteredBooks.length)} من {filteredBooks.length} كتاب
+              {startIndex + 1} - {Math.min(startIndex + ITEMS_PER_PAGE, filteredAuthors.length)} من {filteredAuthors.length} مؤلف
             </>
           ) : (
-            "0 كتب"
+            "0 مؤلفين"
           )}
         </div>
 

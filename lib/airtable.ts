@@ -38,11 +38,11 @@ export async function getBooks(): Promise<BooksRecord[]> {
   });
 }
 
-export async function getWriters(): Promise<AuthorsRecord[]> {
+export async function getAuthors(): Promise<AuthorsRecord[]> {
   const all: AuthorsRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.writers.id)
+    base(AIRTABLE_CONFIG.tables.authors.id)
       .select({ pageSize: 100 })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
