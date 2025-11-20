@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { AuthorsRecord } from "@/lib/schema";
+import Lineicons from "@lineiconshq/react-lineicons";
+import { StarFatSolid } from "@lineiconshq/free-icons";
 
 interface AuthorsTableProps {
   authors: AuthorsRecord[];
@@ -72,6 +74,12 @@ export default function AuthorsTable({ authors }: AuthorsTableProps) {
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
                     {"$" + author["Total Revenue"]?.toLocaleString() || "—"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
+                    <div className="flex items-center gap-1">
+                        <span className="text-yellow-400"><Lineicons icon={StarFatSolid} size={15} className="text-2xl text-yellow-400" /></span>
+                        <span className="text-zinc-900 dark:text-white">{author['Rating'] || "—"}</span>
+                    </div>
                   </td>
                 </tr>
               ))

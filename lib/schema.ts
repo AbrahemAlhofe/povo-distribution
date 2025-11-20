@@ -174,6 +174,7 @@ export interface AuthorsRecord {
   // Linked books
   Books?: string[]; // multipleRecordLinks to Books
   "Total Revenue": number; // formula - SUM of linked Books' Total Revenues
+  Rating?: number; // formula - AVERAGE of linked Books' Rates
 }
 
 /**
