@@ -6,10 +6,13 @@ import { IndicatorCard } from "./IndicatorCard";
 import type { DashboardMetrics } from "../lib/metrics";
 import { Lineicons } from "@lineiconshq/react-lineicons";
 import { BarChartDollarSolid, Headphone1Solid, Book1Solid, StarFatHalf2Solid } from "@lineiconshq/free-icons";
+import { authClient } from "@/auth-client";
 
 type MetricKey = "revenues" | "listening" | "books" | "rating";
 
 export default function DashboardRow({ metrics }: { metrics: DashboardMetrics }) {
+  const { data } = authClient.useSession();
+
   const [selected, setSelected] = useState<MetricKey | null>("revenues");
 
   const handleHover = (key: MetricKey | null) => () => setSelected(key);
@@ -30,19 +33,23 @@ export default function DashboardRow({ metrics }: { metrics: DashboardMetrics })
   };
 
   const selectedSeries = selected ? getSeries(selected) : [];
-  
+
   // Transform series data for Recharts
   const chartData = selectedSeries.map((value, index) => ({
     name: labels[index] || `Day ${index + 1}`,
     value: value,
   }));
 
-  console.log(chartData)
-
   const selectedLabel = selected ? { revenues: "إجمالي الإيرادات", listening: "عدد دقائق الاستماع", books: "إجمالي الكتب المرفوعة", rating: "متوسط التقييم العام" }[selected] : "الاتجاه";
 
   return (
     <div className="w-full">
+      <div className="mb-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        <h1 className="text-4xl">
+          أهلاً
+          <b> {data?.user?.name}</b>
+        </h1>
+      </div>
       <div className="mb-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <IndicatorCard
           label="إجمالي الإيرادات"

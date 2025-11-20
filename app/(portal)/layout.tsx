@@ -20,13 +20,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl">
-      <body className={`${cairo.variable} antialiased bg-white dark:bg-black`}>
-          <div className="flex min-h-screen">
-            <Navigator />
-            <main className="flex-1 p-6">{children}</main>
-          </div>
-      </body>
-    </html>
+    <>
+      <Navigator />
+      <main className="flex-1 p-6">{children}</main>
+    </>
   );
 }

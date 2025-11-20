@@ -17,12 +17,12 @@ const base = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE);
 /**
  * Fetch all performance records to calculate dashboard metrics
  */
-async function getAllPerformanceRecords(): Promise<PerformanceRecord[]> {
+async function getAllPerformanceRecords(clientEmail: string): Promise<PerformanceRecord[]> {
   const all: PerformanceRecord[] = [];
 
   return new Promise((resolve, reject) => {
     base(AIRTABLE_CONFIG.tables.performanceRecords.id)
-      .select({ pageSize: 100 })
+      .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
           all.push(
@@ -44,12 +44,12 @@ async function getAllPerformanceRecords(): Promise<PerformanceRecord[]> {
 /**
  * Fetch all books
  */
-async function getAllBooks(): Promise<BooksRecord[]> {
+async function getAllBooks(clientEmail: string): Promise<BooksRecord[]> {
   const all: BooksRecord[] = [];
 
   return new Promise((resolve, reject) => {
     base(AIRTABLE_CONFIG.tables.books.id)
-      .select({ pageSize: 100 })
+      .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
           all.push(
@@ -95,11 +95,11 @@ function calculatePercentageChange(current: number, previous: number): number {
 /**
  * Calculate dashboard metrics from Airtable data
  */
-export async function calculateDashboardMetrics(): Promise<DashboardMetrics> {
+export async function calculateDashboardMetrics({ clientEmail }: { clientEmail: string }): Promise<DashboardMetrics> {
   try {
     const [books, performances] = await Promise.all([
-      getAllBooks(),
-      getAllPerformanceRecords(),
+      getAllBooks(clientEmail),
+      getAllPerformanceRecords(clientEmail)
     ]);
 
     // Current period metrics
@@ -137,11 +137,8 @@ export async function calculateDashboardMetrics(): Promise<DashboardMetrics> {
     const previousUploadedBooksCount = books.filter((b) => {
       if (!b["Upload Date"]) return false;
       const uploadDate = new Date(b["Upload Date"]);
-      console.log(uploadDate)
       return uploadDate < thirtyDaysAgo && b["Is Active"];
     }).length;
-
-    console.log({previousUploadedBooksCount});
 
     // Calculate average rating from previous period
     const previousValidRatings = previousPerformances.filter(

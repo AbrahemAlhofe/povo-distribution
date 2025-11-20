@@ -1,5 +1,5 @@
 import Airtable, { FieldSet } from "airtable";
-import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord, ClientsRecord } from "./schema";
+import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
 
 function getEnv(name: string) {
   const v = process.env[name];
@@ -220,8 +220,6 @@ export async function getDemographicsData(): Promise<DemographicsData> {
                 count += 1;
             }
 
-            console.log(totalMale)
-
             const demographics: DemographicsData = {
               genderDistribution: {
                 male: Math.round((totalMale / count) * 100),
@@ -367,11 +365,17 @@ export async function getInvoices(limit: number = 20): Promise<InvoicesRecord[]>
   });
 }
 
+type ClientsRecord = FieldSet & {
+  Name: string;
+  Email: string;
+  Password: string;
+};
+
 export async function findClientByEmail(
   email: string
-): Promise<Airtable.Record<FieldSet> | null> {
+): Promise<Airtable.Record<ClientsRecord> | null> {
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.clients.id)
+    base<ClientsRecord>(AIRTABLE_CONFIG.tables.clients.id)
       .select({
         maxRecords: 1,
         filterByFormula: `{Email} = "${email}"`,

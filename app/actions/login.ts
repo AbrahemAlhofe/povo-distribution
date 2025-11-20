@@ -2,9 +2,9 @@
 
 import { redirect } from 'next/navigation'
 import { findClientByEmail } from '@/lib/airtable'
+import { auth } from "@/auth"
 
-
-export type FormState =
+type FormState =
   | {
       errors?: {
         name?: string[]
@@ -37,6 +37,27 @@ export async function login(formState: FormState, formData: FormData): Promise<F
   if (client.fields.Password !== password) {
     return { errors: { password: ['Invalid credentials.'] } };
   }
+
+  try {
+
+      await auth.api.signInEmail({
+          body: {
+              email,
+              password
+          }
+      })
+
+  } catch (error) {
+      await auth.api.signUpEmail({
+        body: {
+            name: client.fields.Name,
+            email,
+            password
+        }
+      })
+      
+  }
+
 
   // If login is successful, redirect to the dashboard or home page
   redirect('/');

@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, type TopAuthor, type TopBook, type DemographicsData } from "../../lib/airtable";
 import { calculateDashboardMetrics } from "../../lib/metrics";
 import { BooksRecord, NotesRecord } from "../../lib/schema";
@@ -6,6 +5,7 @@ import DashboardRow from "../../components/DashboardRow";
 import BooksStatsCharts from "../../components/BooksStatsCharts";
 import DemographicsCharts from "../../components/DemographicsCharts";
 import NotesTable from "../../components/NotesTable";
+import { authClient } from "@/auth-client";
 
 export default async function Home() {
   let books: BooksRecord[] = [];
@@ -15,11 +15,14 @@ export default async function Home() {
   let demographics: DemographicsData | null = null;
   let notes: NotesRecord[] = [];
   let error: string | null = null;
+  const { data } = await authClient.getSession();
+
+  const clientEmail = data?.user?.email || "";
 
   try {
     [books, metrics, topAuthors, topBooks, demographics, notes] = await Promise.all([
       getBooks(),
-      calculateDashboardMetrics(),
+      calculateDashboardMetrics({ clientEmail }),
       getTopAuthors(10),
       getTopBooks(10),
       getDemographicsData(),
