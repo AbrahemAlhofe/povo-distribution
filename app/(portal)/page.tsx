@@ -33,26 +33,20 @@ export default async function Home() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-start py-16 px-6 bg-white dark:bg-black sm:items-start">
-        {error ? (
-          <div className="w-full rounded-md bg-red-50 p-4 text-red-800">خطأ: {error}</div>
-        ) : (
-          <>
-            {/* Dashboard Indicators + single chart window */}
-            {metrics && <DashboardRow metrics={metrics} />}
+    <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
+      {error ? (
+        <div className="w-full rounded-md bg-red-50 p-4 text-red-800">خطأ: {error}</div>
+      ) : (
+        <>
+          {metrics && <DashboardRow metrics={metrics} />}
 
-            {/* Book stats charts (top authors, top books) */}
-            <BooksStatsCharts topAuthors={topAuthors} topBooks={topBooks} />
+          <BooksStatsCharts topAuthors={topAuthors} topBooks={topBooks} />
 
-            {/* Demographics charts (gender and age distribution) */}
-            <DemographicsCharts data={demographics || undefined} />
+          <DemographicsCharts data={demographics || undefined} />
 
-            {/* Notes table */}
-            <NotesTable notes={notes} />
-          </>
-        )}
-      </main>
-    </div>
+          <NotesTable notes={notes} />
+        </>
+      )}
+    </main>
   );
 }

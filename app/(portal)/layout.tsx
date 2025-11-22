@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Cairo } from "next/font/google";
 import "@/app/globals.css";
-import Navigator from "@/components/Navigator";
+import Aside from "@/components/Aside";
+import React from "react";
+import Header from "@/components/Header";
 
 const cairo = Cairo({
   variable: "--font-cairo",
@@ -20,9 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <>
-      <Navigator />
-      <main className="flex-1 p-6">{children}</main>
-    </>
+    <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-cairo)" }}>
+      <Header className="md:hidden"></Header>
+      <div className="flex flex-col-reverse md:flex-row sm:p-6 gap-6">
+        <Aside />
+        <main className="flex-1 overflow-hidden dark:bg-black rounded-lg py-10 px-6">{children}</main>
+      </div>
+    </div>
   );
 }

@@ -21,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <body className={`${cairo.variable} antialiased bg-white dark:bg-black`}>
-          <div className="flex min-h-screen">{children}</div>
+          {children}
       </body>
     </html>
   );
