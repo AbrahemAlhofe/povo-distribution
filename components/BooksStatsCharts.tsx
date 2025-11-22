@@ -21,12 +21,14 @@ function StatCard({ title, items }: { title: string; items: StatItem[] }) {
       <ul className="space-y-3">
         {items.map((it) => (
           <li key={it.id} className="flex items-center justify-between gap-4 rounded-md bg-zinc-50 dark:bg-zinc-800 p-3 border border-zinc-100 dark:border-zinc-700">
-            <div className="text-sm text-zinc-700 dark:text-zinc-200 w-28">${it.amount.toFixed(2)}</div>
-            <div className="flex-1">
-              <div className="text-sm font-medium text-orange-500">{it.title}</div>
-              {it.subtitle && <div className="text-xs text-zinc-500 dark:text-zinc-400">{it.subtitle}</div>}
+            <div className="w-10 h-8 flex items-center justify-center rounded-full bg-zinc-200 text-sm text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">{it.rank}</div>
+            <div className="flex flex-wrap gap-2 flex-1 justify-between items-center">
+              <div className="min-w-40 sm:min-w-25">
+                <div className="text-sm font-medium text-orange-500">{it.title}</div>
+                {it.subtitle && <div className="text-xs text-zinc-500 dark:text-zinc-400">{it.subtitle}</div>}
+              </div>
+              <div className="text-sm text-zinc-700 dark:text-zinc-200">${it.amount.toFixed(2)}</div>
             </div>
-            <div className="w-8 h-8 flex items-center justify-center rounded-full bg-zinc-200 text-sm text-zinc-700 dark:bg-zinc-700 dark:text-zinc-100">{it.rank}</div>
           </li>
         ))}
       </ul>

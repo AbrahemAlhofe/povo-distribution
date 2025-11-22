@@ -87,26 +87,34 @@ export default function DashboardRow({ metrics }: { metrics: DashboardMetrics })
           <div className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{selectedLabel}</div>
           <div className="text-xs text-zinc-400 dark:text-zinc-500">{labels[0] || ""} — {labels[labels.length - 1] || ""}</div>
         </div>
-        <div className="w-full h-64">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }} style={{direction: "ltr"}}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
-              <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: "#ffffff",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: "8px",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-                  color: "#000000",
-                }}
-                cursor={{ fill: "rgba(96, 165, 250, 0.1)" }}
-              />
-              <Bar dataKey="value" fill="#60a5fa" radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <BarChart
+          data={chartData}
+          width={"100%"}
+          height={300}
+          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        >
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              color: "#000000",
+            }}
+            cursor={{ fill: "rgba(96, 165, 250, 0.1)" }}
+          />
+          <Bar dataKey="value" fill="#60a5fa" radius={[8, 8, 0, 0]} />
+          <XAxis
+            dataKey="name"
+            stroke="#9ca3af"
+            style={{ fontSize: "12px" }}
+          />
+          <YAxis
+            stroke="#9ca3af"
+            style={{ fontSize: "12px" }}
+            width={10}
+          />
+        </BarChart>
       </div>
     </div>
   );

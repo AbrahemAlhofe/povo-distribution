@@ -1,7 +1,9 @@
 "use client";
 import React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Line } from "recharts";
 import type { DemographicsData } from "../lib/airtable";
+import Lineicons from "@lineiconshq/react-lineicons";
+import { UserMultiple4Bulk, UserMultiple4Solid } from "@lineiconshq/free-icons";
 
 interface DemographicsChartsProps {
   data?: DemographicsData;
@@ -71,28 +73,36 @@ export default function DemographicsCharts({ data }: DemographicsChartsProps) {
       </div>
 
       {/* Age Distribution Bar Chart */}
-      <div className="rounded-xl bg-white p-6 shadow-sm border border-zinc-100 dark:bg-zinc-900 dark:border-zinc-700">
+      <div className="w-full rounded-xl bg-white p-6 shadow-sm border border-zinc-100 dark:bg-zinc-900 dark:border-zinc-700">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">الفئات العمرية</h3>
-          <span className="text-sm text-zinc-400">👥</span>
+          <span className="text-sm text-zinc-400">
+            <Lineicons icon={UserMultiple4Bulk} className="text-lg" />
+          </span>
         </div>
-        <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={ageData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }} style={{direction: "ltr"}}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
-            <YAxis stroke="#9ca3af" style={{ fontSize: "12px" }} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#ffffff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
-                color: "#000000",
-              }}
-              formatter={(value) => `${value}%`}
-            />
-            <Bar dataKey="value" fill={AGE_COLOR} radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <BarChart
+          data={ageData}
+          width={"100%"}
+          height={300}
+          margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+        > 
+          <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
+          <YAxis
+            stroke="#9ca3af"
+            style={{ fontSize: "12px" }}
+            width={10}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "8px",
+              color: "#000000",
+            }}
+            formatter={(value) => `${value}%`}
+          />
+          <Bar dataKey="value" fill={AGE_COLOR} radius={[8, 8, 0, 0]} />
+        </BarChart>
       </div>
     </div>
   );
