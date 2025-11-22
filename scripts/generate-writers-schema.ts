@@ -14,8 +14,6 @@ async function main() {
 
   const base = new (Airtable as any)({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE);
 
-  console.log(`Fetching first page of records from table: ${WRITERS_TABLE}`);
-
   const records = await base(WRITERS_TABLE).select({ pageSize: 5 }).firstPage();
   if (!records || records.length === 0) {
     console.error("No records found in the writers table. Make sure the table name/id is correct.");
