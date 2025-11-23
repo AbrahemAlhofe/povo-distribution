@@ -22,12 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-cairo)" }}>
-      <Header className="md:hidden"></Header>
-      <div className="flex flex-col-reverse md:flex-row sm:p-6 gap-6">
-        <Aside />
-        <main className="flex-1 overflow-hidden dark:bg-black rounded-lg py-10 px-6">{children}</main>
-      </div>
-    </div>
+    <html lang='ar' dir="rtl">
+      <body className={`${cairo.variable} antialiased bg-white dark:bg-black`}>
+        <div className="min-h-screen flex flex-col" style={{ fontFamily: "var(--font-cairo)" }}>
+          <Header className="md:hidden"></Header>
+          <div className="flex flex-col-reverse md:flex-row sm:p-6 gap-6">
+            <Aside />
+            <main className="flex-1 overflow-hidden dark:bg-black rounded-lg py-10 px-6">{children}</main>
+          </div>
+        </div>
+      </body>
+    </html>
   );
 }
