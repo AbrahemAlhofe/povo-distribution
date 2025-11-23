@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { findClientByEmail } from '@/lib/airtable'
-import { auth } from "@/auth"
+import { cookies } from 'next/headers';
 
 type FormState =
   | {
@@ -38,26 +38,18 @@ export async function login(formState: FormState, formData: FormData): Promise<F
     return { errors: { password: ['Invalid credentials.'] } };
   }
 
-  try {
+  // Set session cookie (this is a simplified example; use secure methods in production)
+  const session = {
+    email: client.fields.Email,
+    name: client.fields.Name,
+    id: client.id,
+  };
 
-      await auth.api.signInEmail({
-          body: {
-              email,
-              password
-          }
-      })
-
-  } catch (error) {
-      await auth.api.signUpEmail({
-        body: {
-            name: client.fields.Name,
-            email,
-            password
-        }
-      })
-      
-  }
-
+  (await cookies()).set({
+    name: 'session',
+    value: encodeURIComponent(JSON.stringify(session)),
+    maxAge: 60 * 60 * 24 * 7
+  });
 
   // If login is successful, redirect to the dashboard or home page
   redirect('/');

@@ -6,13 +6,11 @@ import { IndicatorCard } from "./IndicatorCard";
 import type { DashboardMetrics } from "../lib/metrics";
 import { Lineicons } from "@lineiconshq/react-lineicons";
 import { BarChartDollarSolid, Headphone1Solid, Book1Solid, StarFatHalf2Solid } from "@lineiconshq/free-icons";
-import { authClient } from "@/auth-client";
+import { Session } from "@/lib/types";
 
 type MetricKey = "revenues" | "listening" | "books" | "rating";
 
-export default function DashboardRow({ metrics }: { metrics: DashboardMetrics }) {
-  const { data } = authClient.useSession();
-
+export default function DashboardRow({ session, metrics }: { session: Session | null, metrics: DashboardMetrics }) {
   const [selected, setSelected] = useState<MetricKey | null>("revenues");
 
   const handleHover = (key: MetricKey | null) => () => setSelected(key);
@@ -47,7 +45,7 @@ export default function DashboardRow({ metrics }: { metrics: DashboardMetrics })
       <div className="mb-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         <h1 className="text-4xl">
           أهلاً
-          <b> {data?.user?.name}</b>
+          <b> {session?.name}</b>
         </h1>
       </div>
       <div className="mb-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">

@@ -5,7 +5,8 @@ import DashboardRow from "../../components/DashboardRow";
 import BooksStatsCharts from "../../components/BooksStatsCharts";
 import DemographicsCharts from "../../components/DemographicsCharts";
 import NotesTable from "../../components/NotesTable";
-import { authClient } from "@/auth-client";
+import { cookies } from "next/headers";
+import { Session } from "@/lib/types";
 
 export default async function Home() {
   let books: BooksRecord[] = [];
@@ -15,9 +16,11 @@ export default async function Home() {
   let demographics: DemographicsData | null = null;
   let notes: NotesRecord[] = [];
   let error: string | null = null;
-  const { data } = await authClient.getSession();
-
-  const clientEmail = data?.user?.email || "";
+  const cookieStore = cookies();
+  const sessionCookie = (await cookieStore).get("session");
+  const session: Session | null = sessionCookie ? JSON.parse(decodeURIComponent(sessionCookie.value)) : null;
+  const clientEmail = session?.email || "";
+  console.log("Client Email:", clientEmail);
 
   try {
     [books, metrics, topAuthors, topBooks, demographics, notes] = await Promise.all([
@@ -38,7 +41,7 @@ export default async function Home() {
         <div className="w-full rounded-md bg-red-50 p-4 text-red-800">خطأ: {error}</div>
       ) : (
         <>
-          {metrics && <DashboardRow metrics={metrics} />}
+          {metrics && <DashboardRow session={session} metrics={metrics} />}
 
           <BooksStatsCharts topAuthors={topAuthors} topBooks={topBooks} />
 
