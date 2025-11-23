@@ -1,8 +1,4 @@
-"use client";
-import React from "react";
-import type { TopAuthor, TopBook } from "../lib/airtable";
-
-interface StatItem {
+export interface StatItem {
   id: string;
   title: string;
   subtitle?: string;
@@ -10,7 +6,7 @@ interface StatItem {
   rank: number;
 }
 
-function StatCard({ title, items }: { title: string; items: StatItem[] }) {
+export default function StatCard({ title, items }: { title: string; items: StatItem[] }) {
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm border border-zinc-100 dark:bg-zinc-900 dark:border-zinc-700">
       <div className="flex items-center justify-between mb-4">
@@ -32,38 +28,6 @@ function StatCard({ title, items }: { title: string; items: StatItem[] }) {
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-interface BooksStatsChartsProps {
-  topAuthors?: TopAuthor[];
-  topBooks?: TopBook[];
-}
-
-export default function BooksStatsCharts({ topAuthors = [], topBooks = [] }: BooksStatsChartsProps) {
-  // Transform TopAuthor to StatItem
-  const authorsItems: StatItem[] = topAuthors.map((author, index) => ({
-    id: author.id,
-    title: author.name,
-    subtitle: author.bookCount == 2 ? "كتابان" : author.bookCount == 1 ? "كتاب واحد" : `${author.bookCount} كتب`,
-    amount: author.totalRevenue,
-    rank: index + 1,
-  }));
-
-  // Transform TopBook to StatItem
-  const booksItems: StatItem[] = topBooks.map((book, index) => ({
-    id: book.id,
-    title: book.title,
-    subtitle: book.authorName,
-    amount: book.totalRevenue,
-    rank: index + 1,
-  }));
-
-  return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-      <StatCard title={`أفضل ${topAuthors.length} مؤلفين`} items={authorsItems} />
-      <StatCard title={`أفضل ${topBooks.length} كتب`} items={booksItems} />
     </div>
   );
 }

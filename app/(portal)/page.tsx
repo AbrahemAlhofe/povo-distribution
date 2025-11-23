@@ -2,7 +2,7 @@ import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, ty
 import { calculateDashboardMetrics } from "../../lib/metrics";
 import { BooksRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";
-import BooksStatsCharts from "../../components/BooksStatsCharts";
+import StatCard, { StatItem } from "../../components/StartCard";
 import DemographicsCharts from "../../components/DemographicsCharts";
 import NotesTable from "../../components/NotesTable";
 import { cookies } from "next/headers";
@@ -20,7 +20,6 @@ export default async function Home() {
   const sessionCookie = (await cookieStore).get("session");
   const session: Session | null = sessionCookie ? JSON.parse(decodeURIComponent(sessionCookie.value)) : null;
   const clientEmail = session?.email || "";
-  console.log("Client Email:", clientEmail);
 
   try {
     [books, metrics, topAuthors, topBooks, demographics, notes] = await Promise.all([
@@ -35,6 +34,25 @@ export default async function Home() {
     error = err?.message ?? String(err);
   }
 
+  // Transform TopAuthor to StatItem
+  const authorsItems: StatItem[] = topAuthors.map((author, index) => ({
+    id: author.id,
+    title: author.name,
+    subtitle: author.bookCount == 2 ? "كتابان" : author.bookCount == 1 ? "كتاب واحد" : `${author.bookCount} كتب`,
+    amount: author.totalRevenue,
+    rank: index + 1,
+  }));
+
+  // Transform TopBook to StatItem
+  const booksItems: StatItem[] = topBooks.map((book, index) => ({
+    id: book.id,
+    title: book.title,
+    subtitle: book.authorName,
+    amount: book.totalRevenue,
+    rank: index + 1,
+  }));
+
+
   return (
     <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
       {error ? (
@@ -43,7 +61,10 @@ export default async function Home() {
         <>
           {metrics && <DashboardRow session={session} metrics={metrics} />}
 
-          <BooksStatsCharts topAuthors={topAuthors} topBooks={topBooks} />
+          <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            <StatCard title={`أفضل ${topAuthors.length} مؤلفين`} items={authorsItems} />
+            <StatCard title={`أفضل ${topBooks.length} كتب`} items={booksItems} />
+          </div>
 
           <DemographicsCharts data={demographics || undefined} />
 
