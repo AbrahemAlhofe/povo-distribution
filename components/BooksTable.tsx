@@ -86,7 +86,8 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
                     <div className="flex items-center gap-1">
                       <span className="text-yellow-400"><Lineicons icon={StarFatSolid} size={15} className="text-2xl text-yellow-400" /></span>
                       <span className="text-zinc-900 dark:text-white">
-                        {book.Rate}
+                        {/* {book.Rate} */}
+                        قريبا
                       </span>
                     </div>
                   </td>
