@@ -1,9 +1,8 @@
 "use client";
-import React from "react";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Line } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 import type { DemographicsData } from "../lib/airtable";
 import Lineicons from "@lineiconshq/react-lineicons";
-import { UserMultiple4Bulk, UserMultiple4Solid } from "@lineiconshq/free-icons";
+import { UserMultiple4Bulk } from "@lineiconshq/free-icons";
 
 interface DemographicsChartsProps {
   data?: DemographicsData;
@@ -73,18 +72,22 @@ export default function DemographicsCharts({ data }: DemographicsChartsProps) {
       </div>
 
       {/* Age Distribution Bar Chart */}
-      <div className="w-full rounded-xl bg-white p-6 shadow-sm border border-zinc-100 dark:bg-zinc-900 dark:border-zinc-700">
+      <div className="w-full rounded-xl bg-white p-6 shadow-sm border border-zinc-100 dark:bg-zinc-900 dark:border-zinc-700 flex flex-col">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">الفئات العمرية</h3>
           <span className="text-sm text-zinc-400">
             <Lineicons icon={UserMultiple4Bulk} className="text-lg" />
           </span>
         </div>
+        <div className="flex-1 w-[100%] flex items-center justify-center mb-4 text-xl">
+          <div>قريبا</div>
+        </div>
         <BarChart
           data={ageData}
           width={"100%"}
           height={300}
           margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+          className="hidden"
         > 
           <XAxis dataKey="name" stroke="#9ca3af" style={{ fontSize: "12px" }} />
           <YAxis

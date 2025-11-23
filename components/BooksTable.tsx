@@ -93,7 +93,8 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-2">
                       <span className="text-zinc-600 dark:text-zinc-400">
-                        {Math.round(book["Completion Ratio"] * 100)}%
+                        {/* {Math.round(book["Completion Ratio"] * 100)}% */}
+                        قريبا
                       </span>
                     </div>
                   </td>
