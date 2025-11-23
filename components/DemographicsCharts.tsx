@@ -37,7 +37,10 @@ export default function DemographicsCharts({ data }: DemographicsChartsProps) {
           <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">توزيع الجنس</h3>
           <span className="text-sm text-zinc-400">👤</span>
         </div>
-        <div className="flex justify-center mb-4">
+        <div className="flex-1 w-[100%] flex items-center justify-center mb-4 text-xl">
+          <div>قريبا</div>
+        </div>
+        <div className="hidden flex justify-center mb-4">
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -56,7 +59,7 @@ export default function DemographicsCharts({ data }: DemographicsChartsProps) {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex justify-center gap-6">
+        <div className="hidden flex justify-center gap-6">
           {genderData.map((item, index) => (
             <div key={item.name} className="flex items-center gap-2">
               <span
