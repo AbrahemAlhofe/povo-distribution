@@ -1,13 +1,14 @@
 "use client";
 
-import { BooksRecord } from "@/lib/schema";
+import { BookRecord } from "@/lib/schema";
 import { StarFatSolid } from "@lineiconshq/free-icons";
 import Lineicons from "@lineiconshq/react-lineicons";
+import Link from "next/link";
 import { useState } from "react";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function BooksTable({ books }: { books: BooksRecord[] }) {
+export default function BooksTable({ books }: { books: BookRecord[] }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -59,6 +60,7 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
               <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">دقائق الاستماع</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">التقييم</th>
               <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">معدل الاستماع الكامل</th>
+              <th className="px-6 py-4 text-right text-sm font-semibold text-zinc-900 dark:text-white">تفاصيل الكتاب</th>
             </tr>
           </thead>
           <tbody>
@@ -77,7 +79,7 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
                       : "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-900 dark:text-white">
-                    ${book["Total Revenues"]}
+                    ${book["Total Revenues"].toFixed(2)}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
                     {book["Total Listening Minutes"]}
@@ -98,6 +100,9 @@ export default function BooksTable({ books }: { books: BooksRecord[] }) {
                         قريبا
                       </span>
                     </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-zinc-900 dark:text-white">
+                    <Link href={`/books/${book.id}`}> تفاصيل الكتاب</Link>
                   </td>
                 </tr>
               ))

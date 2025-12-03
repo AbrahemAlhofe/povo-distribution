@@ -1,6 +1,6 @@
 import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, type TopAuthor, type TopBook, type DemographicsData } from "../../lib/database";
 import { calculateDashboardMetrics } from "../../lib/metrics";
-import { BooksRecord, NotesRecord } from "../../lib/schema";
+import { BookRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";
 import StatCard, { StatItem } from "../../components/StartCard";
 import DemographicsCharts from "../../components/DemographicsCharts";
@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 import { Session } from "@/lib/types";
 
 export default async function Home() {
-  let books: BooksRecord[] = [];
+  let books: BookRecord[] = [];
   let metrics = null;
   let topAuthors: TopAuthor[] = [];
   let topBooks: TopBook[] = [];

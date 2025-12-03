@@ -1,5 +1,5 @@
 import Airtable, { FieldSet } from "airtable";
-import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
+import { BookRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
 import { getEnv } from "./utils";
 
 const DATABASE_API_KEY = getEnv("DATABASE_API_KEY");
@@ -7,8 +7,8 @@ const DATABASE_BASE_ID = getEnv("DATABASE_BASE_ID");
 
 export const DatabaseClient = new Airtable({ apiKey: DATABASE_API_KEY }).base(DATABASE_BASE_ID);
 
-export async function getBooks(): Promise<BooksRecord[]> {
-  const all: BooksRecord[] = [];
+export async function getBooks(): Promise<BookRecord[]> {
+  const all: BookRecord[] = [];
 
   return new Promise((resolve, reject) => {
     DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
@@ -19,7 +19,7 @@ export async function getBooks(): Promise<BooksRecord[]> {
             ...records.map((r: any) => ({
               id: r.id,
               ...(r.fields || {}),
-            } as BooksRecord))
+            } as BookRecord))
           );
           fetchNextPage();
         },
@@ -28,6 +28,26 @@ export async function getBooks(): Promise<BooksRecord[]> {
           resolve(all);
         }
       );
+  });
+}
+
+export async function getBookDetails(id: string): Promise<BookRecord | null> {
+  return new Promise((resolve, reject) => {
+    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
+      .find(id, (error: any, record: Airtable.Record<FieldSet> | undefined) => {
+        if (error || record == undefined) {
+          if (error.statusCode === 404) {
+            resolve(null); // Book not found
+          } else {
+            reject(error);
+          }
+        } else {
+          resolve({
+            id: record.id,
+            ...(record.fields || {}),
+          } as BookRecord);
+        } 
+      });
   });
 }
 

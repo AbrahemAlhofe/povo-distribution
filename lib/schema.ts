@@ -1,6 +1,6 @@
 import { getEnv } from "./utils";
 
-export interface BooksRecord {
+export interface BookRecord {
   id: string;
   Title: string; // singleLineText (fldNQdwa0JVIBlA80)
   "Upload Date": string; // date - local format (fldZVQlKvaK7Qvbix)
