@@ -21,7 +21,7 @@ export function IndicatorCard({ label, value, icon, changePercent, unit, onHover
     <div
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className="relative flex flex-col gap-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 cursor-pointer"
+      className="relative flex flex-col flex-1 gap-4 rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 cursor-pointer"
     >
       {/* Header with label and icon */}
       <div className="flex items-center justify-between">

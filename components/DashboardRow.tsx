@@ -48,7 +48,7 @@ export default function DashboardRow({ session, metrics }: { session: Session | 
           <b> {session?.name}</b>
         </h1>
       </div>
-      <div className="mb-6 grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-6 flex flex-row gap-6">
         <IndicatorCard
           label="إجمالي الإيرادات"
           value={`$${metrics.totalRevenues.toLocaleString("en-US")}`}
@@ -70,13 +70,13 @@ export default function DashboardRow({ session, metrics }: { session: Session | 
           changePercent={metrics.uploadedBooksChange}
           onHover={handleHover("books")}
         />
-        <IndicatorCard
+        {/* <IndicatorCard
           label="متوسط التقييم العام"
           value={metrics.averageRating}
           icon={<Lineicons icon={StarFatHalf2Solid} className="text-2xl text-yellow-400" />}
           changePercent={metrics.ratingChange}
           onHover={handleHover("rating")}
-        />
+        /> */}
       </div>
 
       {/* Chart window */}

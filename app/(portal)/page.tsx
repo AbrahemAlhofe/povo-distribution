@@ -24,9 +24,9 @@ export default async function Home() {
   try {
     [books, metrics, topAuthors, topBooks, demographics, notes] = await Promise.all([
       getBooks(),
-      calculateDashboardMetrics({ clientEmail }),
-      getTopAuthors(10),
-      getTopBooks(10),
+      calculateDashboardMetrics({ clientEmail, days: 100 }),
+      getTopAuthors(5),
+      getTopBooks(5),
       getDemographicsData(),
       getNotes(10),
     ]);

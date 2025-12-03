@@ -83,7 +83,7 @@ function calculatePercentageChange(current: number, previous: number): number {
 /**
  * Calculate dashboard metrics from Airtable data
  */
-export async function calculateDashboardMetrics({ clientEmail }: { clientEmail: string }): Promise<DashboardMetrics> {
+export async function calculateDashboardMetrics({ clientEmail, days }: { clientEmail: string, days: number }): Promise<DashboardMetrics> {
   try {
     const [books, performances] = await Promise.all([
       getAllBooks(clientEmail),
@@ -139,7 +139,6 @@ export async function calculateDashboardMetrics({ clientEmail }: { clientEmail: 
         : currentAverageRating;
 
     // Build time series for the last N days (including today)
-    const days = 30;
     const labels: string[] = [];
     const revenuesSeries: number[] = [];
     const listeningMinutesSeries: number[] = [];
