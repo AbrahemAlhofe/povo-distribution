@@ -1,4 +1,4 @@
-import { getBooks } from "@/lib/airtable";
+import { getBooks } from "@/lib/database";
 import BooksTable from "@/components/BooksTable";
 
 export default async function BooksPage() {

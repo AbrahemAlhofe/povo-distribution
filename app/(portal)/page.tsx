@@ -1,4 +1,4 @@
-import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, type TopAuthor, type TopBook, type DemographicsData } from "../../lib/airtable";
+import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, type TopAuthor, type TopBook, type DemographicsData } from "../../lib/database";
 import { calculateDashboardMetrics } from "../../lib/metrics";
 import { BooksRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";

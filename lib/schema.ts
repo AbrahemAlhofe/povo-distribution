@@ -1,16 +1,5 @@
-/**
- * Airtable Schema for Povo Distribution Base
- * Base ID: app7jhjphxvFJdwzg
- * 
- * This file documents the complete structure and types for all tables
- * in the Airtable base.
- */
+import { getEnv } from "./utils";
 
-/**
- * Books Table
- * Main table containing book/audiobook information
- * Table ID: tblmfrxrr3kTnF3S6
- */
 export interface BooksRecord {
   id: string;
   Title: string; // singleLineText (fldNQdwa0JVIBlA80)
@@ -182,7 +171,7 @@ export interface AuthorsRecord {
  */
 export const AIRTABLE_CONFIG = {
   baseId: "app7jhjphxvFJdwzg",
-  apiKey: process.env.AIRTABLE_API_KEY,
+  apiKey: getEnv("DATABASE_API_KEY"),
   tables: {
     books: {
       id: "tblmfrxrr3kTnF3S6",

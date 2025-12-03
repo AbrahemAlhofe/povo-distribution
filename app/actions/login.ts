@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from 'next/navigation'
-import { findClientByEmail } from '@/lib/airtable'
+import { findClientByEmail } from '@/lib/database'
 import { cookies } from 'next/headers';
 
 type FormState =

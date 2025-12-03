@@ -1,24 +1,17 @@
 import Airtable, { FieldSet } from "airtable";
 import { BooksRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
+import { getEnv } from "./utils";
 
-function getEnv(name: string) {
-  const v = process.env[name];
-  if (!v) {
-    throw new Error(`Missing environment variable ${name}`);
-  }
-  return v;
-}
+const DATABASE_API_KEY = getEnv("DATABASE_API_KEY");
+const DATABASE_BASE_ID = getEnv("DATABASE_BASE_ID");
 
-const AIRTABLE_KEY = getEnv("AIRTABLE_API_KEY");
-const AIRTABLE_BASE = getEnv("AIRTABLE_BASE_ID");
-
-const base = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE);
+export const DatabaseClient = new Airtable({ apiKey: DATABASE_API_KEY }).base(DATABASE_BASE_ID);
 
 export async function getBooks(): Promise<BooksRecord[]> {
   const all: BooksRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.books.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
       .select({ pageSize: 100 })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
@@ -42,7 +35,7 @@ export async function getAuthors(): Promise<AuthorsRecord[]> {
   const all: AuthorsRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.authors.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.authors.id)
       .select({ pageSize: 100 })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
@@ -166,14 +159,11 @@ export interface DemographicsData {
  */
 export async function getDemographicsData(): Promise<DemographicsData> {
   try {
-    const base = new Airtable({ apiKey: getEnv("AIRTABLE_API_KEY") }).base(
-      getEnv("AIRTABLE_BASE_ID")
-    );
 
     const all: PerformanceRecord[] = [];
 
     return new Promise((resolve, reject) => {
-      base(AIRTABLE_CONFIG.tables.performanceRecords.id)
+      DatabaseClient(AIRTABLE_CONFIG.tables.performanceRecords.id)
         .select({ pageSize: 100 })
         .eachPage(
           (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
@@ -253,14 +243,10 @@ export interface RevenueMetrics {
  */
 export async function getRevenueMetrics(): Promise<RevenueMetrics> {
   try {
-    const base = new Airtable({ apiKey: getEnv("AIRTABLE_API_KEY") }).base(
-      getEnv("AIRTABLE_BASE_ID")
-    );
-
     const all: InvoicesRecord[] = [];
 
     return new Promise((resolve, reject) => {
-      base(AIRTABLE_CONFIG.tables.invoices.id)
+      DatabaseClient(AIRTABLE_CONFIG.tables.invoices.id)
         .select({ pageSize: 100 })
         .eachPage(
           (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
@@ -312,7 +298,7 @@ export async function getNotes(limit: number = 10): Promise<NotesRecord[]> {
   const all: NotesRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.notes.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.notes.id)
       .select({ 
         pageSize: 100,
         sort: [{ field: "Note ID", direction: "desc" }]
@@ -342,7 +328,7 @@ export async function getInvoices(limit: number = 20): Promise<InvoicesRecord[]>
   const all: InvoicesRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.invoices.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.invoices.id)
       .select({
         pageSize: 100,
         sort: [{ field: "Payment Date", direction: "desc" }],
@@ -375,7 +361,7 @@ export async function findClientByEmail(
   email: string
 ): Promise<Airtable.Record<ClientsRecord> | null> {
   return new Promise((resolve, reject) => {
-    base<ClientsRecord>(AIRTABLE_CONFIG.tables.clients.id)
+    DatabaseClient<ClientsRecord>(AIRTABLE_CONFIG.tables.clients.id)
       .select({
         maxRecords: 1,
         filterByFormula: `{Email} = "${email}"`,

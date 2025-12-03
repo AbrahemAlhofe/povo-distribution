@@ -1,4 +1,4 @@
-import { getAuthors } from "@/lib/airtable";
+import { getAuthors } from "@/lib/database";
 import AuthorsTable from "@/components/AuthorsTable";
 
 export default async function AuthorsPage() {

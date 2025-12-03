@@ -1,6 +1,6 @@
 "use client";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
-import type { DemographicsData } from "../lib/airtable";
+import type { DemographicsData } from "../lib/database";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { UserMultiple4Bulk } from "@lineiconshq/free-icons";
 

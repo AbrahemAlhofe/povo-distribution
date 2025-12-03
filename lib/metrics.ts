@@ -1,18 +1,6 @@
 import { BooksRecord, PerformanceRecord, AIRTABLE_CONFIG } from "./schema";
 import Airtable, { FieldSet } from "airtable";
-
-function getEnv(name: string) {
-  const v = process.env[name];
-  if (!v) {
-    throw new Error(`Missing environment variable ${name}`);
-  }
-  return v;
-}
-
-const AIRTABLE_KEY = getEnv("AIRTABLE_API_KEY");
-const AIRTABLE_BASE = getEnv("AIRTABLE_BASE_ID");
-
-const base = new Airtable({ apiKey: AIRTABLE_KEY }).base(AIRTABLE_BASE);
+import { DatabaseClient } from "./database";
 
 /**
  * Fetch all performance records to calculate dashboard metrics
@@ -21,7 +9,7 @@ async function getAllPerformanceRecords(clientEmail: string): Promise<Performanc
   const all: PerformanceRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.performanceRecords.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.performanceRecords.id)
       .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
@@ -48,7 +36,7 @@ async function getAllBooks(clientEmail: string): Promise<BooksRecord[]> {
   const all: BooksRecord[] = [];
 
   return new Promise((resolve, reject) => {
-    base(AIRTABLE_CONFIG.tables.books.id)
+    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
       .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
       .eachPage(
         (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {

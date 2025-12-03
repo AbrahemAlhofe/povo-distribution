@@ -1,4 +1,4 @@
-import { getRevenueMetrics, getInvoices } from "@/lib/airtable";
+import { getRevenueMetrics, getInvoices } from "@/lib/database";
 import { IndicatorCard } from "@/components/IndicatorCard";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { DollarSolid, CheckCircle1Solid, HourglassSolid } from "@lineiconshq/free-icons";
