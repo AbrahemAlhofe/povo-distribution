@@ -3,7 +3,7 @@
 import { redirect } from 'next/navigation'
 import { cookies } from 'next/headers';
 import { DatabaseClient } from '@/lib/database';
-import { AIRTABLE_CONFIG, ClientsRecord } from '@/lib/schema';
+import { AIRTABLE_CONFIG, ClientRecord } from '@/lib/schema';
 
 type FormState =
   | {
@@ -27,7 +27,7 @@ export async function login(formState: FormState, formData: FormData): Promise<F
     } };
   }
 
-  const client = await DatabaseClient.getOneRecordByFormula<ClientsRecord>(AIRTABLE_CONFIG.tables.clients.id, `{Email} = "${email}"`);
+  const client = await DatabaseClient.getOneRecordByFormula<ClientRecord>(AIRTABLE_CONFIG.tables.clients.id, `{Email} = "${email}"`);
 
   if (!client) {
     return { errors: { email: ['Invalid credentials.'] } };

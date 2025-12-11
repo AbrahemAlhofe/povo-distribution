@@ -1,29 +1,40 @@
 "use client";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
-import type { DemographicsData } from "../lib/database";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { UserMultiple4Bulk } from "@lineiconshq/free-icons";
+
+export interface DemographicsData {
+  genderDistribution: {
+    male: number;
+    female: number;
+  };
+  ageDistribution: {
+    "18-24": number;
+    "25-34": number;
+    "35-44": number;
+    "45-54"?: number;
+    "55+"?: number;
+  };
+}
+
 
 interface DemographicsChartsProps {
   data?: DemographicsData;
 }
 
 export default function DemographicsCharts({ data }: DemographicsChartsProps) {
-  if (!data) {
-    return null;
-  }
 
   // Prepare gender data for pie chart
   const genderData = [
-    { name: "ذكور", value: data.genderDistribution.male },
-    { name: "إناث", value: data.genderDistribution.female },
+    { name: "ذكور", value: data?.genderDistribution.male },
+    { name: "إناث", value: data?.genderDistribution.female },
   ];
 
   // Prepare age data for bar chart
   const ageData = [
-    { name: "18-24", value: data.ageDistribution["18-24"] },
-    { name: "25-34", value: data.ageDistribution["25-34"] },
-    { name: "35-44", value: data.ageDistribution["35-44"] },
+    { name: "18-24", value: data?.ageDistribution["18-24"] },
+    { name: "25-34", value: data?.ageDistribution["25-34"] },
+    { name: "35-44", value: data?.ageDistribution["35-44"] },
   ];
 
   const GENDER_COLORS = ["#3b82f6", "#10b981"];

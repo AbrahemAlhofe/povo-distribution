@@ -1,28 +1,33 @@
-import { getRevenueMetrics, DatabaseClient } from "@/lib/database";
+import { DatabaseClient } from "@/lib/database";
 import { IndicatorCard } from "@/components/IndicatorCard";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { DollarSolid, CheckCircle1Solid, HourglassSolid } from "@lineiconshq/free-icons";
-import { AIRTABLE_CONFIG, InvoicesRecord } from "@/lib/schema";
+import { AIRTABLE_CONFIG, ClientRecord, InvoicesRecord } from "@/lib/schema";
+import { Session } from "@/lib/types";
+import { cookies } from "next/headers";
 
 export default async function RevenuesPage() {
-  const metrics = await getRevenueMetrics();
+  const cookieStore = cookies();
+  const sessionCookie = (await cookieStore).get("session");
+  const session: Session | null = sessionCookie ? JSON.parse(decodeURIComponent(sessionCookie.value)) : null;
+  const client = await DatabaseClient.getOneRecordById<ClientRecord>(AIRTABLE_CONFIG.tables.clients.id, session ? session.id : "") as ClientRecord;
 
   const revenueMetrics = [
     {
       label: "إجمالي الإيرادات",
-      value: `$${(metrics.totalRevenue / 1000).toFixed(1)}K`,
+      value: `$${(client.total_revenue / 1000).toFixed(1)}K`,
       icon: <Lineicons icon={DollarSolid} size={24} color="blue" strokeWidth={1.5} />,
       changePercent: 0,
     },
     {
       label: "الإيرادات المدفوعة",
-      value: `$${(metrics.totalPaidRevenue / 1000).toFixed(1)}K`,
+      value: `$${((client.total_paid_revenue || 0) / 1000).toFixed(1)}K`,
       icon: <Lineicons icon={CheckCircle1Solid} size={24} color="green" strokeWidth={1.5} />,
       changePercent: 0,
     },
     {
       label: "الإيرادات المعلقة",
-      value: `$${(metrics.totalUnpaidRevenue / 1000).toFixed(1)}K`,
+      value: `$${(client.total_unpaid_revenue / 1000).toFixed(1)}K`,
       icon: <Lineicons icon={HourglassSolid} size={24} color="orange" strokeWidth={1.5} />,
       changePercent: 0,
     },

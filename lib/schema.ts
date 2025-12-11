@@ -77,13 +77,16 @@ export interface NotesRecord {
  * Information about content distribution clients
  * Table ID: tblSONl4s0bC6u3Ax
  */
-export interface ClientsRecord {
+export interface ClientRecord {
   id: string;
   client_name: string; // singleLineText (fldWvmNZQY5V0f1ty)
   "Email": string; // email (fld0OmUJfLGQ518vv)
   "Password": string; // singleLineText (fldz1b2YI3pX1qf1J)
   Address: string; // singleLineText (fld05AHNvOQ0VG8C2)
   Performance: string; // singleLineText (fld5qr8UAbeHvIWSm)
+  total_revenue: number;
+  total_paid_revenue: number;
+  total_unpaid_revenue: number;
   
   // Relationships
   Books: string[]; // multipleRecordLinks to Books (fldWKW6VVF4hwWPQ7)

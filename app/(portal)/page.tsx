@@ -1,4 +1,4 @@
-import { getDemographicsData, type DemographicsData, DatabaseClient } from "@/lib/database";
+import { DatabaseClient } from "@/lib/database";
 import { calculateDashboardMetrics } from "../../lib/metrics";
 import { AIRTABLE_CONFIG, AuthorsRecord, BookRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";
@@ -13,7 +13,6 @@ export default async function Home() {
   let metrics = null;
   let topAuthors: StatItem[] = [];
   let topBooks: StatItem[] = [];
-  let demographics: DemographicsData | null = null;
   let notes: NotesRecord[] = [];
   let error: string | null = null;
   const cookieStore = cookies();
@@ -22,10 +21,9 @@ export default async function Home() {
   const clientEmail = session?.email || "";
 
   try {
-    [books, metrics, demographics, notes] = await Promise.all([
+    [books, metrics, notes] = await Promise.all([
       DatabaseClient.getManyRecords<BookRecord>(AIRTABLE_CONFIG.tables.books.id),
       calculateDashboardMetrics({ clientEmail, days: 100 }),
-      getDemographicsData(),
       DatabaseClient.getManyRecords<NotesRecord>(AIRTABLE_CONFIG.tables.notes.id, { maxRecords: 10 }),
     ]);
   } catch (err: any) {
@@ -68,7 +66,7 @@ export default async function Home() {
             <StatCard title={`أفضل ${topBooks.length} كتب`} items={topBooks} />
           </div>
 
-          <DemographicsCharts data={demographics || undefined} />
+          <DemographicsCharts data={undefined} />
 
           <NotesTable notes={notes} />
         </>
