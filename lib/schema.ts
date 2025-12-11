@@ -2,25 +2,19 @@ import { getEnv } from "./utils";
 
 export interface BookRecord {
   id: string;
-  Title: string; // singleLineText (fldNQdwa0JVIBlA80)
-  "Upload Date": string; // date - local format (fldZVQlKvaK7Qvbix)
-  "Is Active": boolean; // checkbox (fld1QVdsRj4EpSiX2)
-  
-  // Relationships
-  Client: string[]; // multipleRecordLinks to Clients (fldF7FjCZ9e34HqYD)
-  Platform: string[]; // multipleRecordLinks to Platforms (fldl6PaSNjuAiOGR3)
-  "Performance Records": string[]; // multipleRecordLinks to Performance Records (fld2iAUWXWDXzura9)
-  
-  // Lookup fields from Performance Records
-  Revenues: number[]; // multipleLookupValues - currency (fldTeVOgAWFHbWbch)
-  "Listening minutes": number[]; // multipleLookupValues - number (fldaAHNsi5xsORJ2j)
-  
-  // Formula fields
-  "Total Revenues": number; // formula - SUM of Revenues (fldBnR6oxKBhzHYUF)
-  "Total Listening Minutes": number; // formula - SUM of Listening minutes (fldBfD1OnP6RgWTrN)
-  Rate: number; // formula - AVERAGE of 5-star Rate (fldKAJpunD84jy6ri)
-  "Platform Names": string[]; // formula - CONCATENATE Platform names (fldXy3b2b2YJ0qv3K)
-  'Completion Ratio': number; // percent with 1 decimal precision (fldCompletionRatio)
+  title: string;
+  upload_date: string;
+  is_active: boolean;
+  client: string;
+  total_revenue: number;
+  platform_names: string[];
+  listening_minutes: number;
+
+  platform: string[];
+  performance_records: string[];
+  revenues: number;
+  rate: number;
+  completion_ratio: number;
 }
 
 /**
@@ -165,7 +159,7 @@ export interface AuthorsRecord {
   "Birthdate"?: string; // date
   // Linked books
   Books?: string[]; // multipleRecordLinks to Books
-  total_revenue: number; // formula - SUM of linked Books' Total Revenues
+  total_revenue: number;
   Rating?: number; // formula - AVERAGE of linked Books' Rates
 }
 

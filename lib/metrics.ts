@@ -68,7 +68,7 @@ export async function calculateDashboardMetrics({ clientEmail, days }: { clientE
       (sum, p) => sum + (p["Total Listening Minutes"] || 0),
       0
     );
-    const currentUploadedBooksCount = books.filter((b) => b["Is Active"]).length;
+    const currentUploadedBooksCount = books.filter((b) => b["is_active"]).length;
 
     // Calculate average rating from current period
     const validRatings = performances.filter((p) => p["5-star Rate"] && p["5-star Rate"] > 0);
@@ -95,9 +95,9 @@ export async function calculateDashboardMetrics({ clientEmail, days }: { clientE
 
     // sort by date, and get the last 30 days uploaded books
     const previousUploadedBooksCount = books.filter((b) => {
-      if (!b["Upload Date"]) return false;
-      const uploadDate = new Date(b["Upload Date"]);
-      return uploadDate < thirtyDaysAgo && b["Is Active"];
+      if (!b["upload_date"]) return false;
+      const uploadDate = new Date(b["upload_date"]);
+      return uploadDate < thirtyDaysAgo && b["is_active"];
     }).length;
 
     // Calculate average rating from previous period
@@ -145,9 +145,9 @@ export async function calculateDashboardMetrics({ clientEmail, days }: { clientE
       const dayAvgRating = dayRatings.length > 0 ? dayRatings.reduce((s, p) => s + p["5-star Rate"], 0) / dayRatings.length : 0;
 
       const dayBooksCount = books.filter((b) => {
-        const uploadDate = toDateKey(b["Upload Date"]);
+        const uploadDate = toDateKey(b["upload_date"]);
         if (!uploadDate) return false;
-        return uploadDate == key && b["Is Active"];
+        return uploadDate == key && b["is_active"];
       }).length;
 
       revenuesSeries.push(parseFloat(dayRevenue.toFixed(2)));

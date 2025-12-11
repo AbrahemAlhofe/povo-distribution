@@ -33,7 +33,7 @@ export default async function Home() {
   try {
     const [authorsRecords, booksRecords] = await Promise.all([
       DatabaseClient.getManyRecordsByFormula<AuthorsRecord>(AIRTABLE_CONFIG.tables.authors.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
-      DatabaseClient.getManyRecordsByFormula<BookRecord>(AIRTABLE_CONFIG.tables.books.id, '', { maxRecords: 5, sort: [{ field: 'Total Revenues', direction: 'desc' }] }),
+      DatabaseClient.getManyRecordsByFormula<BookRecord>(AIRTABLE_CONFIG.tables.books.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
     ]);
 
     topAuthors = authorsRecords.map((author, index) => ({
@@ -45,8 +45,8 @@ export default async function Home() {
 
     topBooks = booksRecords.map((book, index) => ({
       id: book.id,
-      title: book["Title"] || "Unknown Book",
-      amount: book["Total Revenues"] || 0,
+      title: book["title"] || "Unknown Book",
+      amount: book.total_revenue || 0,
       rank: index + 1,
     }));
   } catch (err: any) {
