@@ -11,7 +11,7 @@ async function getAllPerformanceRecords(clientEmail: string): Promise<Performanc
   return DatabaseClient.getManyRecordsByFormula<PerformanceRecord>(
     AIRTABLE_CONFIG.tables.performanceRecords.id,
     `({Client Email} = '${clientEmail}')`,
-    100
+    { pageSize: 100 }
   );
 }
 
@@ -24,7 +24,7 @@ async function getAllBooks(clientEmail: string): Promise<BookRecord[]> {
   return DatabaseClient.getManyRecordsByFormula<BookRecord>(
     AIRTABLE_CONFIG.tables.books.id,
     `({Client Email} = '${clientEmail}')`,
-    100
+    { pageSize: 100 }
   );
 }
 
