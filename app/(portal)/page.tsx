@@ -1,6 +1,6 @@
 import { DatabaseClient } from "@/lib/database";
 import { calculateDashboardMetrics } from "../../lib/metrics";
-import { AIRTABLE_CONFIG, AuthorsRecord, BookRecord, NotesRecord } from "../../lib/schema";
+import { DATABASE_CONFIG, AuthorsRecord, BookRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";
 import StatCard, { StatItem } from "../../components/StartCard";
 import DemographicsCharts from "../../components/DemographicsCharts";
@@ -22,18 +22,21 @@ export default async function Home() {
 
   try {
     [books, metrics, notes] = await Promise.all([
-      DatabaseClient.getManyRecords<BookRecord>(AIRTABLE_CONFIG.tables.books.id),
+      DatabaseClient.getManyRecords<BookRecord>(DATABASE_CONFIG.tables.books.id),
       calculateDashboardMetrics({ clientEmail, days: 100 }),
-      DatabaseClient.getManyRecords<NotesRecord>(AIRTABLE_CONFIG.tables.notes.id, { maxRecords: 10 }),
+      DatabaseClient.getManyRecords<NotesRecord>(DATABASE_CONFIG.tables.notes.id, { maxRecords: 10 }),
     ]);
   } catch (err: any) {
+    console.error("Error fetching initial data:", err);
     error = err?.message ?? String(err);
   }
 
+  console.log("Books fetched:", books);
+
   try {
     const [authorsRecords, booksRecords] = await Promise.all([
-      DatabaseClient.getManyRecordsByFormula<AuthorsRecord>(AIRTABLE_CONFIG.tables.authors.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
-      DatabaseClient.getManyRecordsByFormula<BookRecord>(AIRTABLE_CONFIG.tables.books.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
+      DatabaseClient.getManyRecordsByFormula<AuthorsRecord>(DATABASE_CONFIG.tables.authors.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
+      DatabaseClient.getManyRecordsByFormula<BookRecord>(DATABASE_CONFIG.tables.books.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
     ]);
 
     topAuthors = authorsRecords.map((author, index) => ({

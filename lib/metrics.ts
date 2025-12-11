@@ -1,4 +1,4 @@
-import { BookRecord, PerformanceRecord, AIRTABLE_CONFIG } from "./schema";
+import { BookRecord, PerformanceRecord, DATABASE_CONFIG } from "./schema";
 import Airtable, { FieldSet } from "airtable";
 import { DatabaseClient } from "./database";
 
@@ -9,7 +9,7 @@ async function getAllPerformanceRecords(clientEmail: string): Promise<Performanc
   const all: PerformanceRecord[] = [];
 
   return DatabaseClient.getManyRecordsByFormula<PerformanceRecord>(
-    AIRTABLE_CONFIG.tables.performanceRecords.id,
+    DATABASE_CONFIG.tables.performanceRecords.id,
     `({Client Email} = '${clientEmail}')`,
     { pageSize: 100 }
   );
@@ -22,7 +22,7 @@ async function getAllBooks(clientEmail: string): Promise<BookRecord[]> {
   const all: BookRecord[] = [];
 
   return DatabaseClient.getManyRecordsByFormula<BookRecord>(
-    AIRTABLE_CONFIG.tables.books.id,
+    DATABASE_CONFIG.tables.books.id,
     `({Client Email} = '${clientEmail}')`,
     { pageSize: 100 }
   );

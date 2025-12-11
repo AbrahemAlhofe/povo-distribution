@@ -1,9 +1,9 @@
 import BooksTable from "@/components/BooksTable";
 import { DatabaseClient } from "@/lib/database";
-import { AIRTABLE_CONFIG, BookRecord } from "@/lib/schema";
+import { DATABASE_CONFIG, BookRecord } from "@/lib/schema";
 
 export default async function BooksPage() {
-  const books = await DatabaseClient.getManyRecords<BookRecord>(AIRTABLE_CONFIG.tables.books.id);
+  const books = await DatabaseClient.getManyRecords<BookRecord>(DATABASE_CONFIG.tables.books.id);
 
   return (
     <div className="space-y-6">

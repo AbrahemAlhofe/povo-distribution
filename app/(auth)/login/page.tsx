@@ -5,6 +5,7 @@ import { useActionState } from 'react'
 
 export default function LoginForm() {
   const [state, action, pending] = useActionState(login, undefined);
+  console.log('Login form state:', state);
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-8 space-y-6 bg-zinc-900 rounded-lg shadow-md">

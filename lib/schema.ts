@@ -1,7 +1,10 @@
 import { getEnv } from "./utils";
 
-export interface BookRecord {
+export interface Record {
   id: string;
+}
+
+export interface BookRecord extends Record {
   title: string;
   upload_date: string;
   is_active: boolean;
@@ -22,8 +25,7 @@ export interface BookRecord {
  * Tracks performance metrics for each book on each platform
  * Table ID: tbldniseBzBjpOrJK
  */
-export interface PerformanceRecord {
-  id: string;
+export interface PerformanceRecord extends Record {
   "Record Date": string; // date - local format (fld3ULAA3IQLy7ZOP)
   
   // Relationships
@@ -57,8 +59,7 @@ export interface PerformanceRecord {
  * Stores notes and annotations
  * Table ID: tblkYGBdO17DUte3y
  */
-export interface NotesRecord {
-  id: string;
+export interface NotesRecord extends Record {
   "Note ID": number; // autoNumber (fldPX2dJNOFrjUq0n)
   Body: string; // multilineText (fldTt2VumTdpCJUo9)
   
@@ -74,8 +75,8 @@ export interface NotesRecord {
 export interface ClientRecord {
   id: string;
   client_name: string; // singleLineText (fldWvmNZQY5V0f1ty)
-  "Email": string; // email (fld0OmUJfLGQ518vv)
-  "Password": string; // singleLineText (fldz1b2YI3pX1qf1J)
+  email: string; // email (fld0OmUJfLGQ518vv)
+  password: string; // singleLineText (fldz1b2YI3pX1qf1J)
   Address: string; // singleLineText (fld05AHNvOQ0VG8C2)
   Performance: string; // singleLineText (fld5qr8UAbeHvIWSm)
   total_revenue: number;
@@ -166,12 +167,12 @@ export interface AuthorsRecord {
 /**
  * Airtable Base Configuration Constants
  */
-export const AIRTABLE_CONFIG = {
+export const DATABASE_CONFIG = {
   baseId: "app7jhjphxvFJdwzg",
   apiKey: getEnv("DATABASE_API_KEY"),
   tables: {
     books: {
-      id: "tblmfrxrr3kTnF3S6",
+      id: "mtws6xib4iypxb8",
       name: "Books",
     },
     performanceRecords: {
@@ -179,11 +180,11 @@ export const AIRTABLE_CONFIG = {
       name: "Performance Records",
     },
     notes: {
-      id: "tblkYGBdO17DUte3y",
+      id: "m6en0ndm2rlkym0",
       name: "Notes",
     },
     clients: {
-      id: "tblSONl4s0bC6u3Ax",
+      id: "mvwjkze2vbrtthk",
       name: "Clients",
     },
     platforms: {
@@ -191,11 +192,11 @@ export const AIRTABLE_CONFIG = {
       name: "Platforms",
     },
     invoices: {
-      id: "tbl270pCBvJcYyDLx",
+      id: "m7s60g9vydj9sr2",
       name: "Invoices",
     },
     authors: {
-      id: "tblKcmBwLebSCAnvz",
+      id: "mqumsnd2hj7pekh",
       name: "Authors",
     },
   },

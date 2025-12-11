@@ -2,7 +2,7 @@ import { DatabaseClient } from "@/lib/database";
 import { IndicatorCard } from "@/components/IndicatorCard";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { DollarSolid, CheckCircle1Solid, HourglassSolid } from "@lineiconshq/free-icons";
-import { AIRTABLE_CONFIG, ClientRecord, InvoicesRecord } from "@/lib/schema";
+import { DATABASE_CONFIG, ClientRecord, InvoicesRecord } from "@/lib/schema";
 import { Session } from "@/lib/types";
 import { cookies } from "next/headers";
 
@@ -10,7 +10,7 @@ export default async function RevenuesPage() {
   const cookieStore = cookies();
   const sessionCookie = (await cookieStore).get("session");
   const session: Session | null = sessionCookie ? JSON.parse(decodeURIComponent(sessionCookie.value)) : null;
-  const client = await DatabaseClient.getOneRecordById<ClientRecord>(AIRTABLE_CONFIG.tables.clients.id, session ? session.id : "") as ClientRecord;
+  const client = await DatabaseClient.getOneRecordById<ClientRecord>(DATABASE_CONFIG.tables.clients.id, session ? session.id : "") as ClientRecord;
 
   const revenueMetrics = [
     {
@@ -57,7 +57,7 @@ export default async function RevenuesPage() {
 }
 
 async function InvoicesTable() {
-  const invoices = await DatabaseClient.getManyRecords<InvoicesRecord>(AIRTABLE_CONFIG.tables.invoices.id, { sort: [{ field: "Payment Date", direction: "desc" }] });
+  const invoices = await DatabaseClient.getManyRecords<InvoicesRecord>(DATABASE_CONFIG.tables.invoices.id);
 
   const formatDate = (d?: string) => {
     if (!d) return "—";

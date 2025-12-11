@@ -1,9 +1,9 @@
 import { DatabaseClient } from "@/lib/database";
-import { AIRTABLE_CONFIG, BookRecord } from "@/lib/schema";
+import { DATABASE_CONFIG, BookRecord } from "@/lib/schema";
 
 export default async function BookDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    const bookDetails = await DatabaseClient.getOneRecordById<BookRecord>(AIRTABLE_CONFIG.tables.books.id, id);
+    const bookDetails = await DatabaseClient.getOneRecordById<BookRecord>(DATABASE_CONFIG.tables.books.id, id);
 
     return (
         <div>   
