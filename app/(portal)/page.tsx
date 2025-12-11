@@ -1,6 +1,6 @@
-import { getBooks, getTopAuthors, getTopBooks, getDemographicsData, getNotes, type TopAuthor, type TopBook, type DemographicsData } from "../../lib/database";
+import { getDemographicsData, type DemographicsData, DatabaseClient } from "@/lib/database";
 import { calculateDashboardMetrics } from "../../lib/metrics";
-import { BookRecord, NotesRecord } from "../../lib/schema";
+import { AIRTABLE_CONFIG, AuthorsRecord, BookRecord, NotesRecord } from "../../lib/schema";
 import DashboardRow from "../../components/DashboardRow";
 import StatCard, { StatItem } from "../../components/StartCard";
 import DemographicsCharts from "../../components/DemographicsCharts";
@@ -11,8 +11,8 @@ import { Session } from "@/lib/types";
 export default async function Home() {
   let books: BookRecord[] = [];
   let metrics = null;
-  let topAuthors: TopAuthor[] = [];
-  let topBooks: TopBook[] = [];
+  let topAuthors: StatItem[] = [];
+  let topBooks: StatItem[] = [];
   let demographics: DemographicsData | null = null;
   let notes: NotesRecord[] = [];
   let error: string | null = null;
@@ -22,36 +22,38 @@ export default async function Home() {
   const clientEmail = session?.email || "";
 
   try {
-    [books, metrics, topAuthors, topBooks, demographics, notes] = await Promise.all([
-      getBooks(),
+    [books, metrics, demographics, notes] = await Promise.all([
+      DatabaseClient.getManyRecords<BookRecord>(AIRTABLE_CONFIG.tables.books.id),
       calculateDashboardMetrics({ clientEmail, days: 100 }),
-      getTopAuthors(5),
-      getTopBooks(5),
       getDemographicsData(),
-      getNotes(10),
+      DatabaseClient.getManyRecords<NotesRecord>(AIRTABLE_CONFIG.tables.notes.id, { maxRecords: 10 }),
     ]);
   } catch (err: any) {
     error = err?.message ?? String(err);
   }
 
-  // Transform TopAuthor to StatItem
-  const authorsItems: StatItem[] = topAuthors.map((author, index) => ({
-    id: author.id,
-    title: author.name,
-    subtitle: author.bookCount == 2 ? "كتابان" : author.bookCount == 1 ? "كتاب واحد" : `${author.bookCount} كتب`,
-    amount: author.totalRevenue,
-    rank: index + 1,
-  }));
+  try {
+    const [authorsRecords, booksRecords] = await Promise.all([
+      DatabaseClient.getManyRecordsByFormula<AuthorsRecord>(AIRTABLE_CONFIG.tables.authors.id, '', { maxRecords: 5, sort: [{ field: 'total_revenue', direction: 'desc' }] }),
+      DatabaseClient.getManyRecordsByFormula<BookRecord>(AIRTABLE_CONFIG.tables.books.id, '', { maxRecords: 5, sort: [{ field: 'Total Revenues', direction: 'desc' }] }),
+    ]);
 
-  // Transform TopBook to StatItem
-  const booksItems: StatItem[] = topBooks.map((book, index) => ({
-    id: book.id,
-    title: book.title,
-    subtitle: book.authorName,
-    amount: book.totalRevenue,
-    rank: index + 1,
-  }));
+    topAuthors = authorsRecords.map((author, index) => ({
+      id: author.id,
+      title: author["Name"] || "Unknown Author",
+      amount: author.total_revenue || 0,
+      rank: index + 1,
+    }));
 
+    topBooks = booksRecords.map((book, index) => ({
+      id: book.id,
+      title: book["Title"] || "Unknown Book",
+      amount: book["Total Revenues"] || 0,
+      rank: index + 1,
+    }));
+  } catch (err: any) {
+    console.error("Error fetching top authors or books:", err);
+  }
 
   return (
     <main className="flex min-h-screen w-full max-w-6xl flex-col items-center justify-start bg-white dark:bg-black sm:items-start">
@@ -62,8 +64,8 @@ export default async function Home() {
           {metrics && <DashboardRow session={session} metrics={metrics} />}
 
           <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <StatCard title={`أفضل ${topAuthors.length} مؤلفين`} items={authorsItems} />
-            <StatCard title={`أفضل ${topBooks.length} كتب`} items={booksItems} />
+            <StatCard title={`أفضل ${topAuthors.length} مؤلفين`} items={topAuthors} />
+            <StatCard title={`أفضل ${topBooks.length} كتب`} items={topBooks} />
           </div>
 
           <DemographicsCharts data={demographics || undefined} />

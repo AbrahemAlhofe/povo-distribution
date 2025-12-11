@@ -73,7 +73,7 @@ export default function AuthorsTable({ authors }: AuthorsTableProps) {
                     {author.Name || "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
-                    {"$" + author["Total Revenue"]?.toLocaleString() || "—"}
+                    {"$" + author.total_revenue?.toLocaleString() || "—"}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
                     <div className="flex items-center gap-1">

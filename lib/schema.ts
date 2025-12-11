@@ -79,7 +79,7 @@ export interface NotesRecord {
  */
 export interface ClientsRecord {
   id: string;
-  "Client Name": string; // singleLineText (fldWvmNZQY5V0f1ty)
+  client_name: string; // singleLineText (fldWvmNZQY5V0f1ty)
   "Email": string; // email (fld0OmUJfLGQ518vv)
   "Password": string; // singleLineText (fldz1b2YI3pX1qf1J)
   Address: string; // singleLineText (fld05AHNvOQ0VG8C2)
@@ -162,7 +162,7 @@ export interface AuthorsRecord {
   "Birthdate"?: string; // date
   // Linked books
   Books?: string[]; // multipleRecordLinks to Books
-  "Total Revenue": number; // formula - SUM of linked Books' Total Revenues
+  total_revenue: number; // formula - SUM of linked Books' Total Revenues
   Rating?: number; // formula - AVERAGE of linked Books' Rates
 }
 

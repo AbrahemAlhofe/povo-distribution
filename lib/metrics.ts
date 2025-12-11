@@ -8,25 +8,11 @@ import { DatabaseClient } from "./database";
 async function getAllPerformanceRecords(clientEmail: string): Promise<PerformanceRecord[]> {
   const all: PerformanceRecord[] = [];
 
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.performanceRecords.id)
-      .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as PerformanceRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all);
-        }
-      );
-  });
+  return DatabaseClient.getManyRecordsByFormula<PerformanceRecord>(
+    AIRTABLE_CONFIG.tables.performanceRecords.id,
+    `({Client Email} = '${clientEmail}')`,
+    100
+  );
 }
 
 /**
@@ -35,25 +21,11 @@ async function getAllPerformanceRecords(clientEmail: string): Promise<Performanc
 async function getAllBooks(clientEmail: string): Promise<BookRecord[]> {
   const all: BookRecord[] = [];
 
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
-      .select({ pageSize: 100, filterByFormula: `({Client Email} = '${clientEmail}')` })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as BookRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all);
-        }
-      );
-  });
+  return DatabaseClient.getManyRecordsByFormula<BookRecord>(
+    AIRTABLE_CONFIG.tables.books.id,
+    `({Client Email} = '${clientEmail}')`,
+    100
+  );
 }
 
 export interface DashboardMetrics {

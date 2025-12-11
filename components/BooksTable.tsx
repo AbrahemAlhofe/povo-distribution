@@ -82,7 +82,7 @@ export default function BooksTable({ books }: { books: BookRecord[] }) {
                     ${book["Total Revenues"].toFixed(2)}
                   </td>
                   <td className="px-6 py-4 text-sm text-zinc-600 dark:text-zinc-400">
-                    {book["Total Listening Minutes"]}
+                    {Math.round(book["Total Listening Minutes"])}
                   </td>
                   <td className="px-6 py-4 text-sm">
                     <div className="flex items-center gap-1">

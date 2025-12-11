@@ -1,163 +1,112 @@
 import Airtable, { FieldSet } from "airtable";
-import { BookRecord, PerformanceRecord, AuthorsRecord, NotesRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
+import { PerformanceRecord, AIRTABLE_CONFIG, InvoicesRecord } from "./schema";
 import { getEnv } from "./utils";
 
 const DATABASE_API_KEY = getEnv("DATABASE_API_KEY");
 const DATABASE_BASE_ID = getEnv("DATABASE_BASE_ID");
 
-export const DatabaseClient = new Airtable({ apiKey: DATABASE_API_KEY }).base(DATABASE_BASE_ID);
 
-export async function getBooks(): Promise<BookRecord[]> {
-  const all: BookRecord[] = [];
+export class DatabaseClient {
 
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
-      .select({ pageSize: 100 })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as BookRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all);
-        }
-      );
-  });
-}
+  private constructor() {}
 
-export async function getBookDetails(id: string): Promise<BookRecord | null> {
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.books.id)
-      .find(id, (error: any, record: Airtable.Record<FieldSet> | undefined) => {
-        if (error || record == undefined) {
-          if (error.statusCode === 404) {
-            resolve(null); // Book not found
-          } else {
-            reject(error);
-          }
-        } else {
-          resolve({
-            id: record.id,
-            ...(record.fields || {}),
-          } as BookRecord);
-        } 
-      });
-  });
-}
+  static databaseProvider: Airtable.Base | null = null;
 
-export async function getAuthors(): Promise<AuthorsRecord[]> {
-  const all: AuthorsRecord[] = [];
-
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.authors.id)
-      .select({ pageSize: 100 })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as AuthorsRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all);
-        }
-      );
-  });
-}
-
-export interface TopAuthor {
-  id: string;
-  name: string;
-  bookCount: number;
-  totalRevenue: number;
-}
-
-export interface TopBook {
-  id: string;
-  title: string;
-  authorName: string;
-  totalRevenue: number;
-}
-
-/**
- * Get top 10 authors by revenue
- * Note: This requires an Authors field on BooksRecord linking to Writers table
- */
-export async function getTopAuthors(limit: number = 10): Promise<TopAuthor[]> {
-  try {
-    const books = await getBooks();
-
-    // Group books by author and sum revenues
-    // Assuming books have an Authors field linking to WritersRecord
-    const authorStats: Record<string, { name: string; bookCount: number; totalRevenue: number; id: string }> = {};
-
-    for (const book of books) {
-      // Check if book has an Authors field (this may need to be updated based on your schema)
-      const authorId = (book as any)['Author'];
-      const authorName = (book as any)['Author Name'] as string | undefined || "";
-      const revenue = book["Total Revenues"] || 0;
-
-      if (!authorId) continue;
-
-        if (!authorStats[authorId]) {
-          authorStats[authorId] = {
-            id: authorId,
-            name: authorName,
-            bookCount: 0,
-            totalRevenue: 0,
-          };
-        }
-        authorStats[authorId].totalRevenue += revenue;
-        authorStats[authorId].bookCount += 1;
+  static getContext(): Airtable.Base {
+    if (!DatabaseClient.databaseProvider) {
+      DatabaseClient.databaseProvider = new Airtable({ apiKey: DATABASE_API_KEY }).base(DATABASE_BASE_ID);
     }
-
-    // Sort by revenue and return top N
-    return Object.values(authorStats)
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
-      .slice(0, limit)
-      .map((author) => ({
-        id: author.id,
-        name: author.name,
-        bookCount: author.bookCount,
-        totalRevenue: author.totalRevenue,
-      }));
-  } catch (error) {
-    console.error("Error fetching top authors:", error);
-    throw error;
+    return DatabaseClient.databaseProvider;
   }
-}
 
-/**
- * Get top 10 books by revenue
- */
-export async function getTopBooks(limit: number = 10): Promise<TopBook[]> {
-  try {
-    const books = await getBooks();
-
-    return books
-      .map((book) => ({
-        id: book.id,
-        title: book.Title || "بلا عنوان",
-        authorName: (book as any)["Author Name"] || "كاتب غير معروف", // placeholder field
-        totalRevenue: book["Total Revenues"] || 0,
-      }))
-      .filter((b) => b.totalRevenue > 0) // only books with revenue
-      .sort((a, b) => b.totalRevenue - a.totalRevenue)
-      .slice(0, limit);
-  } catch (error) {
-    console.error("Error fetching top books:", error);
-    throw error;
+  static getManyRecords<T>(tableId: string, options: { pageSize?: number; sort?: { field: string; direction: "asc" | "desc" }[], maxRecords?: number } = {}): Promise<T[]> {
+    const allRecords: T[] = [];
+    return new Promise((resolve, reject) => {
+      DatabaseClient.getContext()(tableId)
+          .select({ pageSize: options.pageSize || 100, maxRecords: options.maxRecords || 1000, sort: options.sort || [] })
+          .eachPage(
+            (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+              allRecords.push(
+                ...records.map((r: any) => ({
+                  id: r.id,
+                  ...(r.fields || {}),
+                } as T))
+              );
+              fetchNextPage();
+            },
+            (err?: any) => {
+              if (err) return reject(err);
+              resolve(allRecords);
+            }
+          );
+    });
   }
+
+  static getManyRecordsByFormula<T>(tableId: string, formula: string, options: { pageSize?: number, maxRecords?: number, sort?: { field: string; direction: "asc" | "desc" }[] } = {}): Promise<T[]> {
+    const allRecords: T[] = [];
+    return new Promise((resolve, reject) => {
+      console.log('Fetching records from table:', tableId, 'with formula:', formula, 'and options:', options);
+      DatabaseClient.getContext()(tableId)
+          .select({ pageSize: options.pageSize || 100, maxRecords: options.maxRecords || 1000, filterByFormula: formula, sort: options.sort || [] })
+          .eachPage(
+            (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
+              allRecords.push(
+                ...records.map((r: any) => ({
+                  id: r.id,
+                  ...(r.fields || {}),
+                } as T))
+              );
+              fetchNextPage();
+            },
+            (err?: any) => {
+              if (err) return reject(err);
+              resolve(allRecords);
+            }
+          );
+    });
+  }
+
+  static getOneRecordById<T>(tableId: string, recordId: string): Promise<T | null> {
+    return new Promise((resolve, reject) => {
+      DatabaseClient.getContext()(tableId)
+        .find(recordId, (error: any, record: Airtable.Record<FieldSet> | undefined) => {
+          if (error || record == undefined) {
+            if (error.statusCode === 404) {
+              resolve(null);
+            } else {
+              reject(error);
+            }
+          } else {
+            resolve({
+              id: record.id,
+              ...(record.fields || {}),
+            } as T);
+          }
+        });
+    });
+  }
+
+  static getOneRecordByFormula<T>(tableId: string, formula: string): Promise<T | null> {
+    return new Promise((resolve, reject) => {
+      DatabaseClient.getContext()(tableId)
+        .select({ maxRecords: 1, filterByFormula: formula })
+        .firstPage((err, records) => {
+          if (err) {
+            reject(err);
+          } else {
+            if (records && records.length > 0) {
+              resolve({
+                id: records[0].id,
+                ...(records[0].fields || {}),
+              } as T);
+            } else {
+              resolve(null);
+            }
+          }
+        });
+    });
+  }
+
 }
 
 export interface DemographicsData {
@@ -180,23 +129,8 @@ export interface DemographicsData {
 export async function getDemographicsData(): Promise<DemographicsData> {
   try {
 
-    const all: PerformanceRecord[] = [];
-
-    return new Promise((resolve, reject) => {
-      DatabaseClient(AIRTABLE_CONFIG.tables.performanceRecords.id)
-        .select({ pageSize: 100 })
-        .eachPage(
-          (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-            all.push(
-              ...records.map((r: any) => ({
-                id: r.id,
-                ...(r.fields || {}),
-              } as PerformanceRecord))
-            );
-            fetchNextPage();
-          },
-          (err?: any) => {
-            if (err) return reject(err);
+    return new Promise(async (resolve, reject) => {
+      const all: PerformanceRecord[] = await DatabaseClient.getManyRecords<PerformanceRecord>(AIRTABLE_CONFIG.tables.performanceRecords.id);
 
             // get the last performance record for each book
             const latestRecordsMap: Record<string, PerformanceRecord> = {};
@@ -243,8 +177,6 @@ export async function getDemographicsData(): Promise<DemographicsData> {
             };
 
             resolve(demographics);
-          }
-        );
     });
   } catch (error) {
     console.error("Error fetching demographics data:", error);
@@ -263,138 +195,34 @@ export interface RevenueMetrics {
  */
 export async function getRevenueMetrics(): Promise<RevenueMetrics> {
   try {
-    const all: InvoicesRecord[] = [];
 
-    return new Promise((resolve, reject) => {
-      DatabaseClient(AIRTABLE_CONFIG.tables.invoices.id)
-        .select({ pageSize: 100 })
-        .eachPage(
-          (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-            all.push(
-              ...records.map((r: any) => ({
-                id: r.id,
-                ...(r.fields || {}),
-              }))
-            );
-            fetchNextPage();
-          },
-          (err?: any) => {
-            if (err) return reject(err);
+    return new Promise(async (resolve, reject) => {
+      const all = await DatabaseClient.getManyRecords<InvoicesRecord>(AIRTABLE_CONFIG.tables.invoices.id);
 
-            let totalRevenue = 0;
-            let totalPaidRevenue = 0;
-            let totalUnpaidRevenue = 0;
+      let totalRevenue = 0;
+      let totalPaidRevenue = 0;
+      let totalUnpaidRevenue = 0;
 
-            for (const invoice of all) {
-              const amount = invoice['Invoice Amount'] || 0;
-              const isPaid = invoice['Is Paid'] || "";
+      for (const invoice of all) {
+        const amount = invoice['Invoice Amount'] || 0;
+        const isPaid = invoice['Is Paid'] || "";
 
-              totalRevenue += amount;
-              if (isPaid) {
-                totalPaidRevenue += amount;
-              } else {
-                totalUnpaidRevenue += amount;
-              }
-            }
+        totalRevenue += amount;
+        if (isPaid) {
+          totalPaidRevenue += amount;
+        } else {
+          totalUnpaidRevenue += amount;
+        }
+      }
 
-            resolve({
-              totalRevenue,
-              totalPaidRevenue,
-              totalUnpaidRevenue,
-            });
-          }
-        );
+      resolve({
+        totalRevenue,
+        totalPaidRevenue,
+        totalUnpaidRevenue,
+      });
     });
   } catch (error) {
     console.error("Error fetching revenue metrics:", error);
     throw error;
   }
-}
-
-/**
- * Get recent notes
- */
-export async function getNotes(limit: number = 10): Promise<NotesRecord[]> {
-  const all: NotesRecord[] = [];
-
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.notes.id)
-      .select({ 
-        pageSize: 100,
-        sort: [{ field: "Note ID", direction: "desc" }]
-      })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as NotesRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all.slice(0, limit));
-        }
-      );
-  });
-}
-
-/**
- * Get invoices
- */
-export async function getInvoices(limit: number = 20): Promise<InvoicesRecord[]> {
-  const all: InvoicesRecord[] = [];
-
-  return new Promise((resolve, reject) => {
-    DatabaseClient(AIRTABLE_CONFIG.tables.invoices.id)
-      .select({
-        pageSize: 100,
-        sort: [{ field: "Payment Date", direction: "desc" }],
-      })
-      .eachPage(
-        (records: Airtable.Records<FieldSet>, fetchNextPage: () => void) => {
-          all.push(
-            ...records.map((r: any) => ({
-              id: r.id,
-              ...(r.fields || {}),
-            } as InvoicesRecord))
-          );
-          fetchNextPage();
-        },
-        (err?: any) => {
-          if (err) return reject(err);
-          resolve(all.slice(0, limit));
-        }
-      );
-  });
-}
-
-type ClientsRecord = FieldSet & {
-  Name: string;
-  Email: string;
-  Password: string;
-};
-
-export async function findClientByEmail(
-  email: string
-): Promise<Airtable.Record<ClientsRecord> | null> {
-  return new Promise((resolve, reject) => {
-    DatabaseClient<ClientsRecord>(AIRTABLE_CONFIG.tables.clients.id)
-      .select({
-        maxRecords: 1,
-        filterByFormula: `{Email} = "${email}"`,
-      })
-      .firstPage((err, records) => {
-        if (err) {
-          return reject(err)
-        }
-        if (records && records.length > 0) {
-          resolve(records[0])
-        } else {
-          resolve(null)
-        }
-      })
-  })
 }

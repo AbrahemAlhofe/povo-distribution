@@ -1,9 +1,10 @@
-import { getAuthors } from "@/lib/database";
 import AuthorsTable from "@/components/AuthorsTable";
+import { DatabaseClient } from "@/lib/database";
+import { AIRTABLE_CONFIG, AuthorsRecord } from "@/lib/schema";
 
 export default async function AuthorsPage() {
-  const authors = await getAuthors();
-
+  const authors = await DatabaseClient.getManyRecordsByFormula<AuthorsRecord>(AIRTABLE_CONFIG.tables.authors.id, '', { pageSize: 10, sort: [{ field: 'total_revenue', direction: 'asc' }] });
+  
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

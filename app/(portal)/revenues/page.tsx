@@ -1,7 +1,8 @@
-import { getRevenueMetrics, getInvoices } from "@/lib/database";
+import { getRevenueMetrics, DatabaseClient } from "@/lib/database";
 import { IndicatorCard } from "@/components/IndicatorCard";
 import Lineicons from "@lineiconshq/react-lineicons";
 import { DollarSolid, CheckCircle1Solid, HourglassSolid } from "@lineiconshq/free-icons";
+import { AIRTABLE_CONFIG, InvoicesRecord } from "@/lib/schema";
 
 export default async function RevenuesPage() {
   const metrics = await getRevenueMetrics();
@@ -51,7 +52,7 @@ export default async function RevenuesPage() {
 }
 
 async function InvoicesTable() {
-  const invoices = await getInvoices(50);
+  const invoices = await DatabaseClient.getManyRecords<InvoicesRecord>(AIRTABLE_CONFIG.tables.invoices.id, { sort: [{ field: "Payment Date", direction: "desc" }] });
 
   const formatDate = (d?: string) => {
     if (!d) return "—";
